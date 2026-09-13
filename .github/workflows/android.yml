@@ -27,3 +27,9 @@ jobs:
 
       - name: Compilar AdaLink
         run: gradle assembleDebug
+
+      - name: Guardar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: AdaLink-APK
+          path: app/build/outputs/apk/debug/app-debug.apk
