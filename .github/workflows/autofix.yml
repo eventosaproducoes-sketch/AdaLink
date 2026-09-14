@@ -6,7 +6,7 @@ on:
     types: [completed]
 
 permissions:
-  actions: write
+  actions: read
   contents: read
 
 jobs:
@@ -15,6 +15,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Baixar código
+        uses: actions/checkout@v4
+
       - name: Ler erro
         env:
           GH_TOKEN: ${{ github.token }}
