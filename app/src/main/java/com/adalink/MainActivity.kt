@@ -2,136 +2,73 @@ package com.adalink
 
 import android.Manifest
 import android.app.Activity
-import android.os.Bundle
+import android.os.*
 import android.content.pm.PackageManager
-import android.location.Location
-import android.location.LocationListener
-import android.location.LocationManager
+import android.location.*
 import android.graphics.Color
 import android.view.Gravity
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 
 class MainActivity : Activity() {
 
-    private lateinit var status: TextView
-    private lateinit var locationManager: LocationManager
+    private lateinit var info: TextView
+    private lateinit var lm: LocationManager
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onCreate(b: Bundle?) {
+        super.onCreate(b)
 
-        val layout = LinearLayout(this)
-        layout.orientation = LinearLayout.VERTICAL
-        layout.gravity = Gravity.CENTER
-        layout.setPadding(32, 32, 32, 32)
+        info = TextView(this)
+        info.text = "AdaLink\n\nVerificando GNSS..."
+        info.textSize = 20f
+        info.setTextColor(Color.WHITE)
+        info.gravity = Gravity.CENTER
 
-        val titulo = TextView(this)
-        titulo.text = "AdaLink"
-        titulo.textSize = 32f
-        titulo.setTextColor(Color.BLACK)
-        titulo.gravity = Gravity.CENTER
+        val tela = LinearLayout(this)
+        tela.gravity = Gravity.CENTER
+        tela.setBackgroundColor(Color.BLACK)
+        tela.addView(info)
+        setContentView(tela)
 
-        status = TextView(this)
-        status.text = "Afro-Connect Inteligente\n\nVerificando GNSS..."
-        status.textSize = 18f
-        status.gravity = Gravity.CENTER
-        status.setPadding(0, 40, 0, 0)
+        lm = getSystemService(LOCATION_SERVICE) as LocationManager
 
-        layout.addView(titulo)
-        layout.addView(status)
-
-        setContentView(layout)
-
-        locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
-
-        verificarPermissao()
-    }
-
-    private fun verificarPermissao() {
-
-        if (checkSelfPermission(
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-
+        if (Build.VERSION.SDK_INT >= 23 &&
+            checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(
-                arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ),
-                100
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 10
             )
-
-            status.text = "AdaLink\n\nAguardando permissão de localização..."
-            return
-        }
-
-        iniciarGNSS()
+        } else iniciar()
     }
 
-    private fun iniciarGNSS() {
+    private fun iniciar() {
 
-        status.text = "AdaLink\n\nGNSS ativo.\nAguardando localização..."
+        val cb = object : GnssStatus.Callback() {
+            override fun onSatelliteStatusChanged(s: GnssStatus) {
+                var usados = 0
+                for (i in 0 until s.satelliteCount)
+                    if (s.usedInFix(i)) usados++
 
-        try {
-
-            locationManager.requestLocationUpdates(
-                LocationManager.GPS_PROVIDER,
-                2000L,
-                1f,
-                object : LocationListener {
-
-                    override fun onLocationChanged(location: Location) {
-
-                        val latitude =
-                            String.format("%.6f", location.latitude)
-
-                        val longitude =
-                            String.format("%.6f", location.longitude)
-
-                        status.text =
-                            "AdaLink\n\n" +
-                            "GNSS conectado\n\n" +
-                            "Latitude: $latitude\n" +
-                            "Longitude: $longitude\n\n" +
-                            "Sistema pronto para pesquisa de conectividade."
-                    }
-                }
-            )
-
-        } catch (e: SecurityException) {
-
-            status.text =
-                "AdaLink\n\nNão foi possível acessar o GNSS."
+                info.text = """
+                    AdaLink
+                    
+                    🛰️ Satélites: ${s.satelliteCount}
+                    🎯 Usados na posição: $usados
+                    
+                    📡 GNSS ATIVO
+                """.trimIndent()
+            }
         }
+
+        lm.registerGnssStatusCallback(
+            cb, Handler(Looper.getMainLooper())
+        )
     }
 
     override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
+        r: Int, p: Array<out String>, g: IntArray
     ) {
-
-        super.onRequestPermissionsResult(
-            requestCode,
-            permissions,
-            grantResults
-        )
-
-        if (requestCode == 100) {
-
-            if (grantResults.isNotEmpty() &&
-                grantResults[0] == PackageManager.PERMISSION_GRANTED
-            ) {
-
-                iniciarGNSS()
-
-            } else {
-
-                status.text =
-                    "AdaLink\n\n" +
-                    "Permissão de localização não concedida."
-            }
-        }
+        super.onRequestPermissionsResult(r, p, g)
+        if (r == 10 && g.isNotEmpty() &&
+            g[0] == PackageManager.PERMISSION_GRANTED) iniciar()
     }
 }
