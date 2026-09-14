@@ -1,0 +1,35 @@
+name: Build AdaLink Ray-X
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v4
+
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Configurar Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Compilar Ray-X
+        run: gradle -p AdaLink_Laboratório assembleDebug
+
+      - name: Guardar APK Ray-X
+        uses: actions/upload-artifact@v4
+        with:
+          name: AdaLink-Ray-X-APK
+          path: AdaLink_Laboratório/app/build/outputs/apk/debug/app-debug.apk
