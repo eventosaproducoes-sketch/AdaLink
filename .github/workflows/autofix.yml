@@ -1,0 +1,18 @@
+name: AdaLink AutoFix
+
+on:
+  workflow_run:
+    workflows: ["Build AdaLink"]
+    types: [completed]
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  diagnostico:
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Erro detectado
+        run: echo "AdaLink AutoFix detectou uma falha na Build."
