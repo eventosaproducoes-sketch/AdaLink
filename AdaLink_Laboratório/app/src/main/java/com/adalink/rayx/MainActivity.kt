@@ -90,6 +90,8 @@ class MainActivity : Activity() {
         r.append("\n")
 
         r.append(Analise.texto())
+        r.append("\n\n")
+        r.append(Veredito.texto())
         r.append("\n")
 
         r.append(NTN.texto(this))
