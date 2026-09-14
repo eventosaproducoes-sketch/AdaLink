@@ -85,6 +85,8 @@ class MainActivity : Activity() {
 
         r.append(WifiBluetooth.texto(this))
         r.append("\n")
+        r.append(SatelliteHunter.texto(tm))
+        r.append("\n")
 
         r.append(Gnss.texto(lm))
         r.append("\n")
