@@ -38,10 +38,13 @@ class MainActivity : Activity() {
                     Manifest.permission.ACCESS_COARSE_LOCATION
                 ), 10
             )
-        } else iniciar()
+        } else {
+            iniciar()
+        }
     }
 
     fun iniciar() {
+
         if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             info.text = "AdaLink\n\n🔴 GPS desligado"
             return
@@ -50,12 +53,17 @@ class MainActivity : Activity() {
         info.text = "AdaLink\n\n🛰️ GNSS ligado\nProcurando satélites..."
 
         val cb = object : GnssStatus.Callback() {
-            override fun onSatelliteStatusChanged(s: GnssStatus) {
-                var usados = 0
-                for (i in 0 until s.satelliteCount)
-                    if (s.usedInFix(i)) usados++
 
-                info.text = "AdaLink\n\n" +
+            override fun onSatelliteStatusChanged(s: GnssStatus) {
+
+                var usados = 0
+
+                for (i in 0 until s.satelliteCount) {
+                    if (s.usedInFix(i)) usados++
+                }
+
+                info.text =
+                    "AdaLink\n\n" +
                     "🛰️ Satélites: ${s.satelliteCount}\n" +
                     "🎯 Usados: $usados\n\n" +
                     "📡 GNSS ATIVO"
@@ -63,8 +71,17 @@ class MainActivity : Activity() {
         }
 
         lm.registerGnssStatusCallback(
-            cb, Handler(Looper.getMainLooper())
+            cb,
+            Handler(Looper.getMainLooper())
+        )
+
+        lm.requestLocationUpdates(
+            LocationManager.GPS_PROVIDER,
+            1000L,
+            0f,
+            object : LocationListener {
+                override fun onLocationChanged(location: Location) {}
+            }
         )
     }
 }
-
