@@ -36,7 +36,7 @@ Android: ${Build.VERSION.RELEASE}
 API: ${Build.VERSION.SDK_INT}
 
 Rede atual:
-${TelephonyManager.getNetworkTypeName(tipo)}
+"Tipo de rede: $tipo"
 
 API nativa de satélite:
 ${if (sateliteApi) "Disponível" else "Não disponível"}
