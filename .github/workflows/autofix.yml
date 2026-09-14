@@ -14,5 +14,8 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'failure' }}
     runs-on: ubuntu-latest
     steps:
-      - name: Erro detectado
-        run: echo "AdaLink AutoFix detectou uma falha na Build."
+      - name: Ler erro
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run view ${{ github.event.workflow_run.id }} --log-failed | tail -n 80
