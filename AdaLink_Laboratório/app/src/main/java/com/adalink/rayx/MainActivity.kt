@@ -19,9 +19,13 @@ class MainActivity : Activity() {
         super.onCreate(b)
 
         tela = TextView(this)
-        tela.textSize = 15f
-        tela.setPadding(20, 20, 20, 20)
-        setContentView(tela)
+tela.textSize = 15f
+tela.setPadding(20, 20, 20, 20)
+
+val scroll = android.widget.ScrollView(this)
+scroll.addView(tela)
+
+setContentView(scroll)
 
         lm = getSystemService(LOCATION_SERVICE)
                 as LocationManager
