@@ -25,7 +25,7 @@ object NTNOrbit {
         val z = 0.0
 
         return doubleArrayOf(x, y, z)
-        return doubleArrayOf(x, y, z)
+        
     }
 
     fun velocidadeOrbital(): Double {
