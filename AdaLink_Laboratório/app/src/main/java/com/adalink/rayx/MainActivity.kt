@@ -1,5 +1,5 @@
 package com.adalink.rayx
-
+import android.widget.ScrollView
 import android.Manifest
 import android.app.Activity
 import android.content.pm.PackageManager
@@ -21,7 +21,9 @@ class MainActivity : Activity() {
         tela = TextView(this)
         tela.textSize = 15f
         tela.setPadding(20, 20, 20, 20)
-        setContentView(tela)
+        val rolagem = ScrollView(this)
+rolagem.addView(tela)
+setContentView(rolagem)
 
         lm = getSystemService(LOCATION_SERVICE)
                 as LocationManager
