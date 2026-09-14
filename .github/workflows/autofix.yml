@@ -6,16 +6,23 @@ on:
     types: [completed]
 
 permissions:
-  actions: read
+  actions: write
   contents: read
 
 jobs:
   diagnostico:
     if: ${{ github.event.workflow_run.conclusion == 'failure' }}
     runs-on: ubuntu-latest
+
     steps:
       - name: Ler erro
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh run view ${{ github.event.workflow_run.id }} --log-failed | tail -n 80
+          gh run view ${{ github.event.workflow_run.id }} --log-failed > erro.txt
+
+      - name: Guardar diagnóstico
+        uses: actions/upload-artifact@v4
+        with:
+          name: AdaLink-Diagnostico
+          path: erro.txt
