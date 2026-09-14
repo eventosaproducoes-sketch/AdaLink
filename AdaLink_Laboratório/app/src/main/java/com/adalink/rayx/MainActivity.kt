@@ -86,6 +86,8 @@ class MainActivity : Activity() {
 
         r.append(Gnss.texto(lm))
         r.append("\n")
+        r.append(Analise.texto())
+                r.append("\n")
 
         r.append("==============================\n")
         r.append("🧠 RAY-X\n\n")
