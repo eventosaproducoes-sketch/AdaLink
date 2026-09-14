@@ -99,7 +99,26 @@ class MainActivity : Activity() {
         r.append(NTN.texto(this))
         r.append("\n")
         r.append("\n")
-        r.append(NTNEngine.simular())
+        val local = try {
+    lm.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+} catch (e: SecurityException) {
+    null
+}
+
+if (local != null) {
+    r.append(
+        NTNEngine.simular(
+            local.latitude,
+            local.longitude,
+            local.altitude
+        )
+    )
+} else {
+    r.append(
+        "\n🛰️ NTN ENGINE\n\n" +
+        "Aguardando posição GNSS real..."
+    )
+}
         r.append("\n")
 
         r.append("==============================\n")
