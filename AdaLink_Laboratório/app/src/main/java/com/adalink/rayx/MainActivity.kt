@@ -98,6 +98,9 @@ class MainActivity : Activity() {
 
         r.append(NTN.texto(this))
         r.append("\n")
+        r.append("\n")
+        r.append(NTNEngine.simular())
+        r.append("\n")
 
         r.append("==============================\n")
         r.append("🧠 RAY-X\n\n")
