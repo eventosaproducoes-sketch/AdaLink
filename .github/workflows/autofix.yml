@@ -24,8 +24,22 @@ jobs:
         run: |
           gh run view ${{ github.event.workflow_run.id }} --log-failed > erro.txt
 
+      - name: Classificar erro
+        run: |
+          if grep -qi "compileDebugKotlin" erro.txt; then
+            echo "Tipo: ERRO KOTLIN" > diagnostico.txt
+          elif grep -qi "AndroidManifest" erro.txt; then
+            echo "Tipo: ERRO MANIFEST" > diagnostico.txt
+          elif grep -qi "gradle" erro.txt; then
+            echo "Tipo: ERRO GRADLE" > diagnostico.txt
+          else
+            echo "Tipo: ERRO NÃO IDENTIFICADO" > diagnostico.txt
+          fi
+
       - name: Guardar diagnóstico
         uses: actions/upload-artifact@v4
         with:
           name: AdaLink-Diagnostico
-          path: erro.txt
+          path: |
+            erro.txt
+            diagnostico.txt
