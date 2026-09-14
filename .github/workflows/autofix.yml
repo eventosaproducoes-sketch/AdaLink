@@ -36,6 +36,12 @@ jobs:
             echo "Tipo: ERRO NÃO IDENTIFICADO" > diagnostico.txt
           fi
 
+      - name: Gerar sugestão
+        run: |
+          echo "CORREÇÃO SUGERIDA" > correcao-sugerida.txt
+          cat diagnostico.txt >> correcao-sugerida.txt
+          echo "Revisar o erro antes de alterar o código." >> correcao-sugerida.txt
+
       - name: Guardar diagnóstico
         uses: actions/upload-artifact@v4
         with:
@@ -43,3 +49,4 @@ jobs:
           path: |
             erro.txt
             diagnostico.txt
+            correcao-sugerida.txt
