@@ -1,5 +1,5 @@
 package com.adalink.rayx
-import android.widget.ScrollView
+
 import android.Manifest
 import android.app.Activity
 import android.content.pm.PackageManager
@@ -8,6 +8,7 @@ import android.location.LocationManager
 import android.telephony.TelephonyManager
 import android.os.Bundle
 import android.widget.TextView
+import android.widget.ScrollView
 
 class MainActivity : Activity() {
 
@@ -21,9 +22,10 @@ class MainActivity : Activity() {
         tela = TextView(this)
         tela.textSize = 15f
         tela.setPadding(20, 20, 20, 20)
+
         val rolagem = ScrollView(this)
-rolagem.addView(tela)
-setContentView(rolagem)
+        rolagem.addView(tela)
+        setContentView(rolagem)
 
         lm = getSystemService(LOCATION_SERVICE)
                 as LocationManager
@@ -36,7 +38,6 @@ setContentView(rolagem)
                 Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-
             requestPermissions(
                 arrayOf(
                     Manifest.permission.ACCESS_FINE_LOCATION,
@@ -45,7 +46,6 @@ setContentView(rolagem)
                 ),
                 10
             )
-
         } else {
             diagnostico()
         }
@@ -88,8 +88,10 @@ setContentView(rolagem)
 
         r.append(Gnss.texto(lm))
         r.append("\n")
+
         r.append(Analise.texto())
         r.append("\n")
+
         r.append(NTN.texto(this))
         r.append("\n")
 
@@ -98,15 +100,15 @@ setContentView(rolagem)
         r.append("Diagnóstico integrado ativo.\n")
         r.append("Android + hardware + telefonia +\n")
         r.append("conectividade + Wi-Fi + Bluetooth + GNSS.\n")
-        r.append("\nA análise NTN será feita separadamente.\n")
 
         tela.text = r.toString()
 
         iniciarGnss(r)
     }
 
-    private fun iniciarGnss(base: StringBuilder) {
-
+    private fun iniciarGnss(
+        base: StringBuilder
+    ) {
         try {
 
             if (
@@ -117,37 +119,44 @@ setContentView(rolagem)
                 return
             }
 
-            val callback = object : GnssStatus.Callback() {
+            val callback =
+                object : GnssStatus.Callback() {
 
-                override fun onSatelliteStatusChanged(
-                    status: GnssStatus
-                ) {
-
-                    var usados = 0
-
-                    for (
-                        i in 0 until status.satelliteCount
+                    override fun
+                    onSatelliteStatusChanged(
+                        status: GnssStatus
                     ) {
-                        if (status.usedInFix(i)) {
-                            usados++
+
+                        var usados = 0
+
+                        for (
+                            i in 0 until
+                            status.satelliteCount
+                        ) {
+                            if (
+                                status.usedInFix(i)
+                            ) {
+                                usados++
+                            }
+                        }
+
+                        runOnUiThread {
+
+                            tela.text =
+                                base.toString() +
+                                "\n🛰️ GNSS AO VIVO\n\n" +
+                                "Satélites: " +
+                                status.satelliteCount +
+                                "\n" +
+                                "Usados no fix: " +
+                                usados
                         }
                     }
-
-                    runOnUiThread {
-
-                        tela.text =
-                            base.toString() +
-                            "\n🛰️ GNSS AO VIVO\n\n" +
-                            "Satélites: " +
-                            status.satelliteCount +
-                            "\n" +
-                            "Usados no fix: " +
-                            usados
-                    }
                 }
-            }
 
-            lm.registerGnssStatusCallback(callback)
+            lm.registerGnssStatusCallback(
+                callback
+            )
 
         } catch (e: Exception) {
 
