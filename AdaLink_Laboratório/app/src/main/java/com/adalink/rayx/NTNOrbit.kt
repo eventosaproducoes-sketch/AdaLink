@@ -22,25 +22,12 @@ object NTNOrbit {
 
         val x = r * cos(angulo)
         val y = r * sin(angulo)
-        val z = 0.0
+                val z = 0.0
 
         return doubleArrayOf(x, y, z)
-      fun velocidadeOrbital(): Double {
-    val r = EARTH_KM + ALTITUDE_KM
-    return sqrt(MU / r)
-}
+    }
 
-fun distanciaCentroTerra(
-    tempoSeg: Double
-): Double {
-
-    val p = posicao(tempoSeg)
-
-    return sqrt(
-        p[0] * p[0] +
-        p[1] * p[1] +
-        p[2] * p[2]
-    )
-}
-
+    fun velocidadeOrbital(): Double {
+        val r = EARTH_KM + ALTITUDE_KM
+        return sqrt(MU / r)
     }
