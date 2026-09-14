@@ -25,5 +25,11 @@ object NTNOrbit {
         val z = 0.0
 
         return doubleArrayOf(x, y, z)
+            }
+    }
+
+    fun velocidadeOrbital(): Double {
+        val r = EARTH_KM + ALTITUDE_KM
+        return sqrt(MU / r)
     }
 }
