@@ -20,7 +20,7 @@ class MainActivity : Activity() {
             ==============================
 
             📱 SISTEMA
-            ${Sistema.texto()}
+            
 
             ==============================
 
