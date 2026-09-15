@@ -119,6 +119,24 @@ if (local != null) {
         "Aguardando posição GNSS real..."
     )
 }
+val tempo = System.currentTimeMillis() / 1000.0
+
+val orbita = NTNOrbit.posicao(tempo)
+
+r.append(
+    "\n🛰️ NTN ORBIT — SATÉLITE VIRTUAL\n\n" +
+    "Tempo orbital: %.0f s\n".format(tempo) +
+    "X: %.2f km\n".format(orbita[0]) +
+    "Y: %.2f km\n".format(orbita[1]) +
+    "Z: %.2f km\n".format(orbita[2]) +
+    "Velocidade orbital: %.3f km/s\n".format(
+        NTNOrbit.velocidadeOrbital()
+    ) +
+    "Raio orbital: %.1f km\n".format(
+        NTNOrbit.distanciaCentroTerra(tempo)
+    ) +
+    "\nSTATUS: 🟡 ÓRBITA VIRTUAL"
+)
         r.append("\n")
 
         r.append("==============================\n")
