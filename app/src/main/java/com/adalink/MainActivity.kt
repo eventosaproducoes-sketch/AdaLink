@@ -1,124 +1,87 @@
-package com.adalink.rayx
+package com.adalink
 
 import android.Manifest
 import android.app.Activity
+import android.os.*
 import android.content.pm.PackageManager
-import android.location.LocationManager
-import android.os.Bundle
-import android.widget.TextView
+import android.location.*
+import android.graphics.Color
+import android.view.Gravity
+import android.widget.*
 
 class MainActivity : Activity() {
 
-    private lateinit var tela: TextView
-    private lateinit var lm: LocationManager
+    lateinit var info: TextView
+    lateinit var lm: LocationManager
 
     override fun onCreate(b: Bundle?) {
         super.onCreate(b)
 
-        tela = TextView(this)
-        tela.textSize = 16f
-        tela.setPadding(20, 20, 20, 20)
+        info = TextView(this)
+        info.textSize = 20f
+        info.setTextColor(Color.WHITE)
+        info.gravity = Gravity.CENTER
+
+        val tela = LinearLayout(this)
+        tela.setBackgroundColor(Color.BLACK)
+        tela.gravity = Gravity.CENTER
+        tela.addView(info)
         setContentView(tela)
 
-        lm = getSystemService(LOCATION_SERVICE)
-                as LocationManager
+        lm = getSystemService(LOCATION_SERVICE) as LocationManager
 
-        if (checkSelfPermission(
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(
                 arrayOf(
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION
-                ),
-                10
+                ), 10
             )
         } else {
             iniciar()
         }
     }
 
-    override fun onRequestPermissionsResult(
-        code: Int,
-        permissions: Array<out String>,
-        results: IntArray
-    ) {
-        super.onRequestPermissionsResult(
-            code, permissions, results
+    fun iniciar() {
+
+        if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            info.text = "AdaLink\n\n🔴 GPS desligado"
+            return
+        }
+
+        info.text = "AdaLink\n\n🛰️ GNSS ligado\nProcurando satélites..."
+
+        val cb = object : GnssStatus.Callback() {
+
+            override fun onSatelliteStatusChanged(s: GnssStatus) {
+
+                var usados = 0
+
+                for (i in 0 until s.satelliteCount) {
+                    if (s.usedInFix(i)) usados++
+                }
+
+                info.text =
+                    "AdaLink\n\n" +
+                    "🛰️ Satélites: ${s.satelliteCount}\n" +
+                    "🎯 Usados: $usados\n\n" +
+                    "📡 GNSS ATIVO"
+            }
+        }
+
+        lm.registerGnssStatusCallback(
+            cb,
+            Handler(Looper.getMainLooper())
         )
 
-        if (code == 10) iniciar()
-    }
-
-    private fun iniciar() {
-
-        val local = try {
-            lm.getLastKnownLocation(
-                LocationManager.GPS_PROVIDER
-            )
-        } catch (e: Exception) {
-            null
-        }
-
-        val texto = StringBuilder()
-
-        texto.append("🚀 ADA-LINK RAY-X\n\n")
-
-        texto.append(Sistema.texto())
-        texto.append("\n\n")
-
-        texto.append(Gnss.texto(lm))
-        texto.append("\n\n")
-
-        texto.append("🛰️ NTN ORBIT\n\n")
-
-        if (local != null) {
-
-            val sat = NTNOrbit.posicao(0.0)
-
-            texto.append(
-                "Latitude: %.6f°\n".format(
-                    local.latitude
-                )
-            )
-
-            texto.append(
-                "Longitude: %.6f°\n".format(
-                    local.longitude
-                )
-            )
-
-            texto.append(
-                "Altitude: %.1f m\n\n".format(
-                    local.altitude
-                )
-            )
-
-            texto.append("Satélite virtual: 600 km\n")
-            texto.append(
-                "Velocidade: %.3f km/s\n\n".format(
-                    NTNOrbit.velocidadeOrbital()
-                )
-            )
-
-            texto.append(
-                "Posição orbital:\n" +
-                "X: %.2f km\n".format(sat[0]) +
-                "Y: %.2f km\n".format(sat[1]) +
-                "Z: %.2f km\n\n".format(sat[2])
-            )
-
-            texto.append("🟡 SIMULAÇÃO NTN\n")
-            texto.append("Nenhum sinal RF foi transmitido.")
-
-        } else {
-
-            texto.append(
-                "Aguardando posição GNSS..."
-            )
-        }
-
-        tela.text = texto.toString()
+        lm.requestLocationUpdates(
+            LocationManager.GPS_PROVIDER,
+            1000L,
+            0f,
+            object : LocationListener {
+                override fun onLocationChanged(location: Location) {}
+            }
+        )
     }
 }
