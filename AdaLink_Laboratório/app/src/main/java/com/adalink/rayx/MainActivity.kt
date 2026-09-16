@@ -82,9 +82,10 @@ class MainActivity : Activity() {
 
         r.append(Conectividade.texto(this))
         r.append("\n")
-        
+
         r.append(WifiBluetooth.texto(this))
         r.append("\n")
+
         r.append(SatelliteHunter.texto(tm))
         r.append("\n")
 
@@ -93,57 +94,68 @@ class MainActivity : Activity() {
 
         r.append(Analise.texto())
         r.append("\n\n")
+
         r.append(Veredito.texto())
         r.append("\n")
 
         r.append(NTN.texto(this))
-        r.append("\n")
-        r.append("\n")
+        r.append("\n\n")
+
         val local = try {
-    lm.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-} catch (e: SecurityException) {
-    null
-}
+            lm.getLastKnownLocation(
+                LocationManager.GPS_PROVIDER
+            )
+        } catch (e: SecurityException) {
+            null
+        }
 
-if (local != null) {
-    r.append(
-        NTNEngine.simular(
-            local.latitude,
-            local.longitude,
-            local.altitude
+        if (local != null) {
+
+            r.append(
+                NTNEngine.simular(
+                    local.latitude,
+                    local.longitude,
+                    local.altitude
+                )
+            )
+
+        } else {
+
+            r.append(
+                "\n🛰️ NTN ENGINE\n\n" +
+                "Aguardando posição GNSS real..."
+            )
+        }
+
+        val tempo =
+            System.currentTimeMillis() / 1000.0
+
+        val orbita =
+            NTNOrbit.posicao(tempo)
+
+        r.append(
+            "\n🛰️ NTN ORBIT — SATÉLITE VIRTUAL\n\n" +
+            "Tempo orbital: %.0f s\n".format(tempo) +
+            "X: %.2f km\n".format(orbita[0]) +
+            "Y: %.2f km\n".format(orbita[1]) +
+            "Z: %.2f km\n".format(orbita[2]) +
+            "Velocidade orbital: %.3f km/s\n".format(
+                NTNOrbit.velocidadeOrbital()
+            ) +
+            "Raio orbital: %.1f km\n".format(
+                NTNOrbit.distanciaCentroTerra(tempo)
+            ) +
+            "\nSTATUS: 🟡 ÓRBITA VIRTUAL"
         )
-    )
-} else {
-    r.append(
-        "\n🛰️ NTN ENGINE\n\n" +
-        "Aguardando posição GNSS real..."
-    )
-}
-val tempo = System.currentTimeMillis() / 1000.0
 
-val orbita = NTNOrbit.posicao(tempo)
-
-r.append(
-    "\n🛰️ NTN ORBIT — SATÉLITE VIRTUAL\n\n" +
-    "Tempo orbital: %.0f s\n".format(tempo) +
-    "X: %.2f km\n".format(orbita[0]) +
-    "Y: %.2f km\n".format(orbita[1]) +
-    "Z: %.2f km\n".format(orbita[2]) +
-    "Velocidade orbital: %.3f km/s\n".format(
-        NTNOrbit.velocidadeOrbital()
-    ) +
-    "Raio orbital: %.1f km\n".format(
-        NTNOrbit.distanciaCentroTerra(tempo)
-    ) +
-    "\nSTATUS: 🟡 ÓRBITA VIRTUAL"
-)
-        r.append("\n")
-
+        r.append("\n\n")
         r.append("==============================\n")
         r.append("🧠 RAY-X\n\n")
         r.append("Diagnóstico integrado ativo.\n")
-        r.append("Android + hardware + telefonia +\n")
-        r.append("conectividade + Wi-Fi + Bluetooth + GNSS.\n")
+        r.append(
+            "Android + hardware + telefonia +\n" +
+            "conectividade + Wi-Fi + Bluetooth + GNSS.\n"
+        )
 
         tela.text = r.toString()
 
@@ -153,6 +165,7 @@ r.append(
     private fun iniciarGnss(
         base: StringBuilder
     ) {
+
         try {
 
             if (
@@ -166,34 +179,21 @@ r.append(
             val callback =
                 object : GnssStatus.Callback() {
 
-                    override fun
-                    onSatelliteStatusChanged(
+                    override fun onSatelliteStatusChanged(
                         status: GnssStatus
                     ) {
 
-                        var usados = 0
-
-                        for (
-                            i in 0 until
-                            status.satelliteCount
-                        ) {
-                            if (
-                                status.usedInFix(i)
-                            ) {
-                                usados++
-                            }
-                        }
+                        val deep =
+                            GnssDeepScan.satelites(
+                                status
+                            )
 
                         runOnUiThread {
 
                             tela.text =
                                 base.toString() +
-                                "\n🛰️ GNSS AO VIVO\n\n" +
-                                "Satélites: " +
-                                status.satelliteCount +
-                                "\n" +
-                                "Usados no fix: " +
-                                usados
+                                "\n\n" +
+                                deep
                         }
                     }
                 }
