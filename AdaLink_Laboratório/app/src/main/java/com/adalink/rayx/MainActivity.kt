@@ -229,7 +229,21 @@ class MainActivity : Activity() {
             lm.registerGnssStatusCallback(
                 callback
             )
-
+lm.requestLocationUpdates(
+    LocationManager.GPS_PROVIDER,
+    1000L,
+    0f,
+    object : android.location.LocationListener {
+        override fun onLocationChanged(location: android.location.Location) {
+            tela.append(
+                "\n📍 GNSS LOCATION ATIVA\n" +
+                "Lat: %.6f\n".format(location.latitude) +
+                "Lon: %.6f\n".format(location.longitude) +
+                "Alt: %.1f m".format(location.altitude)
+            )
+        }
+    }
+)
             tela.append(
                 "\n\n🧪 TESTE GNSS CALLBACK\n" +
                 "Callback registrado.\n" +
