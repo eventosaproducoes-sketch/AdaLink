@@ -110,7 +110,6 @@ class MainActivity : Activity() {
         }
 
         if (local != null) {
-
             r.append(
                 NTNEngine.simular(
                     local.latitude,
@@ -118,9 +117,7 @@ class MainActivity : Activity() {
                     local.altitude
                 )
             )
-
         } else {
-
             r.append(
                 "\n🛰️ NTN ENGINE\n\n" +
                 "Aguardando posição GNSS real..."
@@ -159,12 +156,10 @@ class MainActivity : Activity() {
 
         tela.text = r.toString()
 
-        iniciarGnss(r)
+        iniciarGnss()
     }
 
-    private fun iniciarGnss(
-        base: StringBuilder
-    ) {
+    private fun iniciarGnss() {
 
         try {
 
@@ -173,27 +168,60 @@ class MainActivity : Activity() {
                     LocationManager.GPS_PROVIDER
                 )
             ) {
+                tela.append(
+                    "\n\n🛰️ GNSS CALLBACK\n\n" +
+                    "GPS desligado."
+                )
                 return
             }
 
             val callback =
                 object : GnssStatus.Callback() {
 
+                    override fun onStarted() {
+                        runOnUiThread {
+                            tela.append(
+                                "\n\n🟢 GNSS CALLBACK\n" +
+                                "onStarted()"
+                            )
+                        }
+                    }
+
+                    override fun onFirstFix(
+                        ttffMillis: Int
+                    ) {
+                        runOnUiThread {
+                            tela.append(
+                                "\n🟢 onFirstFix(): " +
+                                ttffMillis + " ms"
+                            )
+                        }
+                    }
+
                     override fun onSatelliteStatusChanged(
                         status: GnssStatus
                     ) {
 
                         val deep =
-                            GnssDeepScan.satelites(
-                                status
-                            )
+                            GnssDeepScan.satelites(status)
 
                         runOnUiThread {
 
                             tela.text =
-                                base.toString() +
+                                tela.text.toString() +
                                 "\n\n" +
+                                "🟢 GNSS CALLBACK\n" +
+                                "onSatelliteStatusChanged()\n\n" +
                                 deep
+                        }
+                    }
+
+                    override fun onStopped() {
+                        runOnUiThread {
+                            tela.append(
+                                "\n\n🔴 GNSS CALLBACK\n" +
+                                "onStopped()"
+                            )
                         }
                     }
                 }
@@ -202,10 +230,18 @@ class MainActivity : Activity() {
                 callback
             )
 
+            tela.append(
+                "\n\n🧪 TESTE GNSS CALLBACK\n" +
+                "Callback registrado.\n" +
+                "Aguardando eventos..."
+            )
+
         } catch (e: Exception) {
 
             tela.append(
-                "\n\nGNSS ao vivo: acesso limitado"
+                "\n\n🔴 GNSS CALLBACK\n" +
+                "Erro: " +
+                e.javaClass.simpleName
             )
         }
     }
