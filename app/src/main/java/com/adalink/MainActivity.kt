@@ -113,7 +113,7 @@ class MainActivity : Activity() {
             IntentFilter(Intent.ACTION_BATTERY_CHANGED)
         )
 
-        val nivel = bateria?.getInt
+        
                 val nivel = bateria?.getIntExtra(
             "level",
             -1
@@ -215,7 +215,7 @@ class MainActivity : Activity() {
         resultCode: Int,
         data: Intent?
     ) {
-        super.on
+        
                 super.onActivityResult(
             requestCode,
             resultCode,
