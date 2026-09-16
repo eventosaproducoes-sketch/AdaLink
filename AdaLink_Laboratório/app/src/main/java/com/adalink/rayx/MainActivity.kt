@@ -82,8 +82,7 @@ class MainActivity : Activity() {
 
         r.append(Conectividade.texto(this))
         r.append("\n")
-        r.append(RadioEnvironment.texto(this))
-        r.append("\n")
+        
         r.append(WifiBluetooth.texto(this))
         r.append("\n")
         r.append(SatelliteHunter.texto(tm))
