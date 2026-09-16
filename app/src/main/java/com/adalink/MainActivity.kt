@@ -2,15 +2,17 @@ package com.adalink
 
 import android.Manifest
 import android.app.Activity
-import android.os.Bundle
-import android.content.Intent
+import android.os.*
+import android.content.*
 import android.content.pm.PackageManager
-import android.graphics.Color
-import android.graphics.Paint
+import android.graphics.*
 import android.graphics.pdf.PdfDocument
-import android.location.GnssStatus
-import android.location.LocationManager
+import android.location.*
+import android.net.*
+import android.net.wifi.WifiManager
 import android.widget.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MainActivity : Activity() {
 
@@ -27,18 +29,19 @@ class MainActivity : Activity() {
         val tela = LinearLayout(this)
         tela.orientation = LinearLayout.VERTICAL
         tela.setBackgroundColor(Color.BLACK)
-        tela.setPadding(20, 20, 20, 20)
+        tela.setPadding(20,20,20,20)
 
         val titulo = TextView(this)
         titulo.text = "ADA LINK — RAY-X"
-        titulo.textSize = 22f
+        titulo.textSize = 24f
         titulo.setTextColor(Color.WHITE)
         titulo.gravity = 17
         tela.addView(titulo)
 
-        // BOTÃO DEVE FICAR NO INÍCIO DA PÁGINA
+        // BOTÃO PRINCIPAL: PRIMEIRO ELEMENTO INTERATIVO
         val pdf = Button(this)
         pdf.text = "📄 GERAR PDF DO DIAGNÓSTICO"
+        pdf.textSize = 16f
         tela.addView(pdf)
 
         pdf.setOnClickListener {
@@ -46,9 +49,9 @@ class MainActivity : Activity() {
         }
 
         info = TextView(this)
-        info.textSize = 16f
+        info.textSize = 15f
         info.setTextColor(Color.WHITE)
-        info.text = "\nIniciando diagnóstico..."
+        info.text = "🔎 Iniciando Ray-X..."
         tela.addView(info)
 
         setContentView(tela)
@@ -56,23 +59,10 @@ class MainActivity : Activity() {
         lm = getSystemService(LOCATION_SERVICE)
             as LocationManager
 
-        iniciar()
+        analisar()
     }
-        fun iniciar() {
 
-        if (checkSelfPermission(
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            requestPermissions(
-                arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ),
-                10
-            )
-            return
-        }
+    fun analisar() {
 
         gps = try {
             lm.isProviderEnabled(
@@ -82,13 +72,83 @@ class MainActivity : Activity() {
             false
         }
 
+        val rede = try {
+            val cm = getSystemService(
+                CONNECTIVITY_SERVICE
+            ) as ConnectivityManager
+
+            val n = cm.activeNetwork
+            val c = cm.getNetworkCapabilities(n)
+
+            when {
+                c == null -> "SEM CONEXÃO"
+                c.hasTransport(
+                    NetworkCapabilities.TRANSPORT_WIFI
+                ) -> "WI-FI"
+                c.hasTransport(
+                    NetworkCapabilities.TRANSPORT_CELLULAR
+                ) -> "REDE MÓVEL"
+                else -> "OUTRA"
+            }
+        } catch (e: Exception) {
+            "NÃO IDENTIFICADA"
+        }
+
+        val wifi = try {
+            val wm = applicationContext.getSystemService(
+                WIFI_SERVICE
+            ) as WifiManager
+            if (wm.isWifiEnabled) "ATIVO"
+            else "DESATIVADO"
+        } catch (e: Exception) {
+            "INDISPONÍVEL"
+        }
+
+        val stat = StatFs(filesDir.path)
+        val total = stat.totalBytes / 1073741824
+        val livre = stat.availableBytes / 1073741824
+
+        val bateria = registerReceiver(
+            null,
+            IntentFilter(Intent.ACTION_BATTERY_CHANGED)
+        )
+
+        val nivel = bateria?.getInt
+                val nivel = bateria?.getIntExtra(
+            "level",
+            -1
+        ) ?: -1
+
         info.text =
-            "🔎 RAY-X ANALISANDO...\n\n" +
-            "GNSS/GPS: " +
+            "📡 RAY-X\n\n" +
+            "🛰️ GNSS/GPS: " +
             if (gps) "ATIVO" else "DESATIVADO" +
-            "\n\n" +
-            "📱 ${Build.MANUFACTURER} ${Build.MODEL}" +
-            "\n🤖 Android ${Build.VERSION.RELEASE}"
+            "\n📶 Conexão: $rede" +
+            "\n📡 Wi-Fi: $wifi" +
+            "\n💾 Armazenamento: $livre GB livres / $total GB" +
+            "\n🔋 Bateria: $nivel%" +
+            "\n\n📱 Fabricante: ${Build.MANUFACTURER}" +
+            "\n📱 Modelo: ${Build.MODEL}" +
+            "\n🤖 Android: ${Build.VERSION.RELEASE}"
+
+        if (
+            checkSelfPermission(
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            iniciarGNSS()
+        } else {
+            requestPermissions(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ),
+                10
+            )
+        }
+    }
+
+    fun iniciarGNSS() {
 
         val callback = object : GnssStatus.Callback() {
 
@@ -105,13 +165,12 @@ class MainActivity : Activity() {
                 }
 
                 info.text =
-                    "ADA LINK — RAY-X\n\n" +
+                    "📡 ADA LINK — RAY-X\n\n" +
                     "🛰️ Satélites: $sats\n" +
                     "🎯 Usados no fix: $used\n" +
                     "📡 GNSS: " +
                     if (gps) "ATIVO" else "DESATIVADO" +
-                    "\n\n" +
-                    "📱 ${Build.MANUFACTURER} ${Build.MODEL}" +
+                    "\n\n📱 ${Build.MANUFACTURER} ${Build.MODEL}" +
                     "\n🤖 Android ${Build.VERSION.RELEASE}"
             }
         }
@@ -122,21 +181,31 @@ class MainActivity : Activity() {
                 Handler(Looper.getMainLooper())
             )
 
-            Handler(Looper.getMainLooper()).postDelayed
-                fun gerarPDF() {
+            Handler(Looper.getMainLooper()).postDelayed({
+                try {
+                    lm.unregisterGnssStatusCallback(callback)
+                } catch (e: Exception) {
+                }
+            }, 5000)
 
-        val escolher = Intent(
+        } catch (e: Exception) {
+        }
+    }
+
+    fun gerarPDF() {
+
+        val escolha = Intent(
             Intent.ACTION_CREATE_DOCUMENT
         )
 
-        escolher.type = "application/pdf"
-        escolher.putExtra(
+        escolha.type = "application/pdf"
+        escolha.putExtra(
             Intent.EXTRA_TITLE,
             "AdaLink_RayX.pdf"
         )
 
         startActivityForResult(
-            escolher,
+            escolha,
             100
         )
     }
@@ -146,18 +215,18 @@ class MainActivity : Activity() {
         resultCode: Int,
         data: Intent?
     ) {
-        super.onActivityResult(
+        super.on
+                super.onActivityResult(
             requestCode,
             resultCode,
             data
         )
 
-        if (requestCode != 100 ||
+        if (
+            requestCode != 100 ||
             resultCode != RESULT_OK ||
             data?.data == null
-        ) {
-            return
-        }
+        ) return
 
         try {
 
@@ -172,70 +241,70 @@ class MainActivity : Activity() {
             )
 
             val canvas = pagina.canvas
+            val p = Paint()
 
-            val tinta = Paint()
-            tinta.color = Color.BLACK
-            tinta.textSize = 22f
+            p.color = Color.BLACK
+            p.textSize = 22f
 
             canvas.drawText(
                 "ADA LINK — RAY-X",
                 40f,
                 60f,
-                tinta
+                p
             )
 
-            tinta.textSize = 16f
+            p.textSize = 16f
 
             canvas.drawText(
                 "RELATÓRIO DE DIAGNÓSTICO",
                 40f,
                 95f,
-                tinta
+                p
             )
 
-            tinta.textSize = 14f
+            p.textSize = 14f
 
             canvas.drawText(
                 "GNSS/GPS: " +
                     if (gps) "ATIVO" else "DESATIVADO",
                 40f,
-                145f,
-                tinta
+                160f,
+                p
             )
 
             canvas.drawText(
                 "Satélites detectados: $sats",
                 40f,
-                180f,
-                tinta
+                195f,
+                p
             )
 
             canvas.drawText(
                 "Satélites usados no fix: $used",
                 40f,
-                215f,
-                tinta
+                230f,
+                p
             )
 
             canvas.drawText(
                 "Fabricante: ${Build.MANUFACTURER}",
                 40f,
-                265f,
-                tinta
+                275f,
+                p
             )
 
             canvas.drawText(
                 "Modelo: ${Build.MODEL}",
                 40f,
-                300f,
-                tinta
+                310f,
+                p
             )
 
             canvas.drawText(
                 "Android: ${Build.VERSION.RELEASE}",
                 40f,
-                335f,
-                tinta
+                345f,
+                p
             )
 
             documento.finishPage(pagina)
@@ -262,6 +331,7 @@ class MainActivity : Activity() {
                 "Erro ao gerar PDF",
                 Toast.LENGTH_LONG
             ).show()
-                }
-    }
         }
+    }    
+}
+}
