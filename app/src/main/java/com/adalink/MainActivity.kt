@@ -263,7 +263,7 @@ class MainActivity : Activity() {
                     "${e.message}"
             }
         }
-
+    }
     fun gerarPDF() {
 
         val escolha = Intent(
