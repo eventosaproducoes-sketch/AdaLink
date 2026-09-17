@@ -151,10 +151,29 @@ class MainActivity : Activity() {
     fun iniciarGNSS() {
 
         val callback = object : GnssStatus.Callback() {
+    override fun onStarted() {
+        runOnUiThread {
+            info.text = "🛰️ GNSS CALLBACK INICIADO"
+        }
+    }
 
-            override fun onSatelliteStatusChanged(
-                status: GnssStatus
-            ) {
+    override fun onFirstFix(ttffMillis: Int) {
+        runOnUiThread {
+            info.text =
+                "🛰️ GNSS CALLBACK INICIADO\n" +
+                "📍 PRIMEIRO FIX: ${ttffMillis} ms"
+        }
+    }
+
+    override fun onStopped() {
+        runOnUiThread {
+            info.text = "⚠️ GNSS CALLBACK PARADO"
+        }
+    }
+
+    override fun onSatelliteStatusChanged(
+        status: GnssStatus
+    ) {
                 sats = status.satelliteCount
                 used = 0
 
@@ -216,25 +235,34 @@ class MainActivity : Activity() {
             }
         }
 
-        try {
+                try {
+
             lm.registerGnssStatusCallback(
                 callback,
                 Handler(Looper.getMainLooper())
             )
 
-            
-lm.requestLocationUpdates(
-    LocationManager.GPS_PROVIDER,
-    1000L,
-    0f,
-    object : LocationListener {
-        override fun onLocationChanged(location: Location) {
-        }
-    }
-)
+            lm.requestLocationUpdates(
+                LocationManager.GPS_PROVIDER,
+                1000L,
+                0f,
+                object : LocationListener {
+                    override fun onLocationChanged(
+                        location: Location
+                    ) {
+                    }
+                }
+            )
+
         } catch (e: Exception) {
+
+            runOnUiThread {
+                info.text =
+                    "❌ ERRO NO GNSS\n\n" +
+                    "${e.javaClass.simpleName}\n" +
+                    "${e.message}"
+            }
         }
-    }
 
     fun gerarPDF() {
 
