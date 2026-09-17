@@ -59,11 +59,38 @@ class MainActivity : Activity() {
         lm = getSystemService(LOCATION_SERVICE)
             as LocationManager
 
-           analisar()
+           if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+    != PackageManager.PERMISSION_GRANTED
+) {
+    requestPermissions(
+        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+        1001
+    )
+} else {
+    analisar()
     iniciarGNSS()
+           }
  }
     
+override fun onRequestPermissionsResult(
+    requestCode: Int,
+    permissions: Array<out String>,
+    grantResults: IntArray
+) {
+    super.onRequestPermissionsResult(
+        requestCode,
+        permissions,
+        grantResults
+    )
 
+    if (requestCode == 1001 &&
+        grantResults.isNotEmpty() &&
+        grantResults[0] == PackageManager.PERMISSION_GRANTED
+    ) {
+        analisar()
+        iniciarGNSS()
+    }
+}
     fun analisar() {
 
         gps = try {
