@@ -59,8 +59,10 @@ class MainActivity : Activity() {
         lm = getSystemService(LOCATION_SERVICE)
             as LocationManager
 
-        analisar()
-    }
+        62    analisar()
+63    iniciarGNSS()
+64 }
+    
 
     fun analisar() {
 
