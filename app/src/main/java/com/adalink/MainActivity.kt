@@ -260,7 +260,7 @@ override fun onRequestPermissionsResult(
                     )
                 }
         DataReservoir.armazenar(
-    this,
+    this@MainActivity,
     "RAY-X",
     "GNSS",
     detalhes.toString()
