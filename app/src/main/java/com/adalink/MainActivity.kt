@@ -47,7 +47,21 @@ class MainActivity : Activity() {
         pdf.setOnClickListener {
             gerarPDF()
         }
+val reservatorio = Button(this)
+reservatorio.text = "📦 CONSULTAR ADA RESERVOIR"
+reservatorio.textSize = 16f
+tela.addView(reservatorio)
 
+reservatorio.setOnClickListener {
+    val quantidade = DataReservoir.quantidade(this@MainActivity)
+    val tamanho = DataReservoir.tamanhoTotal(this@MainActivity)
+
+    Toast.makeText(
+        this@MainActivity,
+        "📦 ADA RESERVOIR\nPacotes: $quantidade\nDados: $tamanho bytes",
+        Toast.LENGTH_LONG
+    ).show()
+}
         info = TextView(this)
         info.textSize = 15f
         info.setTextColor(Color.WHITE)
