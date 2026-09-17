@@ -164,14 +164,55 @@ class MainActivity : Activity() {
                     }
                 }
 
-                info.text =
-                    "📡 ADA LINK — RAY-X\n\n" +
-                    "🛰️ Satélites: $sats\n" +
-                    "🎯 Usados no fix: $used\n" +
-                    "📡 GNSS: " +
-                    if (gps) "ATIVO" else "DESATIVADO" +
-                    "\n\n📱 ${Build.MANUFACTURER} ${Build.MODEL}" +
-                    "\n🤖 Android ${Build.VERSION.RELEASE}"
+                                val detalhes = StringBuilder()
+
+                detalhes.append(
+                    "🛰️ ADA LINK — RAY-X\n\n"
+                )
+
+                detalhes.append(
+                    "Satélites detectados: ${status.satelliteCount}\n"
+                )
+
+                detalhes.append(
+                    "Usados no fix: $used\n\n"
+                )
+
+                for (i in 0 until status.satelliteCount) {
+
+                    detalhes.append(
+                        "SV ${status.getSvid(i)} | " +
+                        "Const ${status.getConstellationType(i)}\n"
+                    )
+
+                    detalhes.append(
+                        "C/N0: %.1f dB-Hz\n".format(
+                            status.getCn0DbHz(i)
+                        )
+                    )
+
+                    detalhes.append(
+                        "Az: %.1f° | El: %.1f°\n".format(
+                            status.getAzimuthDegrees(i),
+                            status.getElevationDegrees(i)
+                        )
+                    )
+
+                    if (Build.VERSION.SDK_INT >= 26) {
+                        detalhes.append(
+                            "Freq: %.3f MHz\n".format(
+                                status.getCarrierFrequencyHz(i) /
+                                    1_000_000.0
+                            )
+                        )
+                    }
+
+                    detalhes.append(
+                        "Usado no fix: ${status.usedInFix(i)}\n\n"
+                    )
+                }
+
+                info.text = detalhes.toString()
             }
         }
 
