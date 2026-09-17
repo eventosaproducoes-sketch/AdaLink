@@ -222,12 +222,7 @@ class MainActivity : Activity() {
                 Handler(Looper.getMainLooper())
             )
 
-            Handler(Looper.getMainLooper()).postDelayed({
-                try {
-                    lm.unregisterGnssStatusCallback(callback)
-                } catch (e: Exception) {
-                }
-            }, 5000)
+            
 
         } catch (e: Exception) {
         }
