@@ -61,7 +61,18 @@ reservatorio.setOnClickListener {
         "📦 ADA RESERVOIR\nPacotes: $quantidade\nDados: $tamanho bytes",
         Toast.LENGTH_LONG
     ).show()
-}
+}         val energia = Button(this)
+        energia.text = "⚡ DIAGNÓSTICO DE ENERGIA"
+        energia.textSize = 16f
+        tela.addView(energia)
+
+        energia.setOnClickListener {
+            Toast.makeText(
+                this@MainActivity,
+                AdaEnergyDiagnostic.diagnostico(this@MainActivity),
+                Toast.LENGTH_LONG
+            ).show()
+        }
         info = TextView(this)
         info.textSize = 15f
         info.setTextColor(Color.WHITE)
