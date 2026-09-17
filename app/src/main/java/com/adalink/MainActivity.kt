@@ -259,6 +259,12 @@ override fun onRequestPermissionsResult(
                         "Usado no fix: ${status.usedInFix(i)}\n\n"
                     )
                 }
+        DataReservoir.armazenar(
+    this,
+    "RAY-X",
+    "GNSS",
+    detalhes.toString()
+)
 
                 info.text = detalhes.toString()
             }
