@@ -223,7 +223,15 @@ class MainActivity : Activity() {
             )
 
             
-
+lm.requestLocationUpdates(
+    LocationManager.GPS_PROVIDER,
+    1000L,
+    0f,
+    object : LocationListener {
+        override fun onLocationChanged(location: Location) {
+        }
+    }
+)
         } catch (e: Exception) {
         }
     }
