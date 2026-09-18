@@ -1,7 +1,7 @@
 package com.adalink
 
 import android.location.GnssMeasurementsEvent
-
+import android.location.GnssStatus
 import android.os.Build
 
 object GnssRawProbe {
