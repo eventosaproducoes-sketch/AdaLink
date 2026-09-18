@@ -58,7 +58,17 @@ class MainActivity : Activity() {
                 Toast.LENGTH_LONG
             ).show()
         }
+        val radio = Button(this)
+        radio.text = "📡 RADIO ENVIRONMENT"
+        tela.addView(radio)
 
+        radio.setOnClickListener {
+        Toast.makeText(
+        this,
+        RadioEnvironment.analisar(this),
+        Toast.LENGTH_LONG
+        ).show()
+       }
         info = TextView(this)
         info.textSize = 14f
         info.setTextColor(Color.WHITE)
