@@ -1,6 +1,5 @@
 package com.adalink
 
-import android.location.GnssMeasurement
 import android.location.GnssMeasurementsEvent
 import android.location.GnssStatus
 import android.os.Build
