@@ -1,7 +1,7 @@
 package com.adalink
 
 import android.location.GnssMeasurementsEvent
-import android.location.GnssStatus
+
 import android.os.Build
 
 object GnssRawProbe {
@@ -62,10 +62,8 @@ val clock = event.clock
             )
 
             r.append(
-                "Pseudorange: %.3f m\n".format(
-                    m.pseudorangeMeters
-                )
-            )
+    "Pseudorange: não fornecida diretamente pela API\n"
+)
 
             r.append(
                 "Pseudorange Rate: %.3f m/s\n".format(
