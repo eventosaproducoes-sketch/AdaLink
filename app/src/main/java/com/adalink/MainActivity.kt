@@ -16,10 +16,10 @@ class MainActivity : Activity() {
 
     private var sats = 0
     private var used = 0
-
+    private var ultimoRaw = ""
     override fun onCreate(b: Bundle?) {
         super.onCreate(b)
-
+    
         val tela = LinearLayout(this)
         tela.orientation = LinearLayout.VERTICAL
         tela.setPadding(20, 20, 20, 20)
@@ -98,7 +98,20 @@ class MainActivity : Activity() {
             iniciarGNSS()
         }
     }
+val rawCallback = object : GnssMeasurementsEvent.Callback() {
 
+    override fun onGnssMeasurementsReceived(
+        event: GnssMeasurementsEvent
+    ) {
+        val resultado = GnssRawProbe.analisar(event)
+
+        ultimoRaw = resultado
+
+        runOnUiThread {
+            info.text = resultado
+        }
+    }
+}
     private fun iniciarGNSS() {
 
         val callback = object : GnssStatus.Callback() {
@@ -137,11 +150,12 @@ class MainActivity : Activity() {
             }
         }
 
-        lm.registerGnssStatusCallback(
-            callback,
-            Handler(mainLooper)
-        )
+        lm.registerGnssStatusCallback(callback, Handler(mainLooper))
 
+lm.registerGnssMeasurementsCallback(
+    rawCallback,
+    Handler(mainLooper)
+)
         try {
             lm.requestLocationUpdates(
                 LocationManager.GPS_PROVIDER,
