@@ -120,8 +120,9 @@ class MainActivity : Activity() {
                 .setPositiveButton("FECHAR", null)
                 .show()
         }
-        val mathematicalEngine = Button(this)
+          val mathematicalEngine = Button(this)
 mathematicalEngine.text = "🧮 MATHEMATICAL ENGINE"
+tela.addView(mathematicalEngine)
 
 mathematicalEngine.setOnClickListener {
     val capacidades = CapabilityMap.mapear(this@MainActivity)
@@ -134,7 +135,6 @@ mathematicalEngine.setOnClickListener {
         .show()
 }
 
-layout.addView(mathematicalEngine)
                 val requirementMatrix = Button(this)
         requirementMatrix.text = "🧩 ADA REQUIREMENT MATRIX"
         tela.addView(requirementMatrix)
