@@ -120,6 +120,17 @@ class MainActivity : Activity() {
                 .setPositiveButton("FECHAR", null)
                 .show()
         }
+                val requirementMatrix = Button(this)
+        requirementMatrix.text = "🧩 ADA REQUIREMENT MATRIX"
+        tela.addView(requirementMatrix)
+
+        requirementMatrix.setOnClickListener {
+            AlertDialog.Builder(this@MainActivity)
+                .setTitle("🧩 ADA REQUIREMENT MATRIX")
+                .setMessage(RequirementMatrix.resumo())
+                .setPositiveButton("FECHAR", null)
+                .show()
+        }
         info = TextView(this)
         info.textSize = 14f
         info.setTextColor(Color.WHITE)
