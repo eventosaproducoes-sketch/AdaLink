@@ -40,6 +40,14 @@ object MathematicalEngine {
             possuiCandidata = quantidade > 0
         )
     }
+        fun idsDasCapacidades(
+        capacidades: List<AdaCapability>
+    ): List<String> {
+
+        return capacidades.map { capacidade ->
+            capacidade.id
+        }
+        }
     fun analisar(
         requisito: AdaRequirement,
         capacidades: List<AdaCapability>
