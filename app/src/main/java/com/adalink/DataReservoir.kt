@@ -17,7 +17,7 @@ data class AdaPacket(
 object DataReservoir {
 
     private const val FILE_NAME = "adalink_reservoir.json"
-
+private const val BACKUP_FILE_NAME = "adalink_reservoir_backup.json"
     private fun file(context: Context): File {
         return File(context.filesDir, FILE_NAME)
     }
