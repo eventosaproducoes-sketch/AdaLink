@@ -79,12 +79,13 @@ object PacketEngine {
     fun resumo(context: Context): String {
 
         val r = analisar(context)
-
+        val dadosFormatados = formatarDados(r.bytes)
         return """
             ⚙️ ADA PACKET ENGINE
 
             Pacotes preservados: ${r.pacotes}
             Dados preservados: ${r.bytes} bytes
+$dadoFormatados
             Fontes identificadas: ${r.fontes}
             Tipos identificados: ${r.tipos}
 
