@@ -120,6 +120,21 @@ class MainActivity : Activity() {
                 .setPositiveButton("FECHAR", null)
                 .show()
         }
+        val mathematicalEngine = Button(this)
+mathematicalEngine.text = "🧮 MATHEMATICAL ENGINE"
+
+mathematicalEngine.setOnClickListener {
+    val capacidades = CapabilityMap.mapear(this@MainActivity)
+    val resultado = MathematicalEngine.resumoCapacidades(capacidades)
+
+    AlertDialog.Builder(this@MainActivity)
+        .setTitle("🧮 ADA MATHEMATICAL ENGINE")
+        .setMessage(resultado)
+        .setPositiveButton("FECHAR", null)
+        .show()
+}
+
+layout.addView(mathematicalEngine)
                 val requirementMatrix = Button(this)
         requirementMatrix.text = "🧩 ADA REQUIREMENT MATRIX"
         tela.addView(requirementMatrix)
