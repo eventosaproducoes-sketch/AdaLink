@@ -120,9 +120,21 @@ object DataReservoir {
         }
     }
 
-    fun limpar(
+        fun limpar(
         context: Context
     ) {
         file(context).delete()
+    }
+
+    fun dadosDoReservatorio(
+        context: Context
+    ): String {
+        val f = file(context)
+
+        if (!f.exists()) {
+            return "[]"
+        }
+
+        return f.readText()
     }
 }
