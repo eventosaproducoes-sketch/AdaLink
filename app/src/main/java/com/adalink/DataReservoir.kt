@@ -33,7 +33,10 @@ object DataReservoir {
         return try {
             JSONArray(f.readText())
         } catch (e: Exception) {
-            JSONArray()
+            throw IllegalStateException(
+    "ADA RESERVOIR CORROMPIDO — NÃO SOBRESCREVER DADOS",
+    e
+)
         }
     }
 
