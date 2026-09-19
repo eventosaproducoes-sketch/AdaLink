@@ -27,7 +27,19 @@ data class AdaCompatibilityResult(
 
 
 object MathematicalEngine {
+    fun avaliarCandidatas(
+        entrada: AdaCompatibilityInput
+    ): AdaCompatibilityResult {
 
+        val quantidade = entrada.capacidadeIds.size
+
+        return AdaCompatibilityResult(
+            requisitoId = entrada.requisitoId,
+            capacidadeIds = entrada.capacidadeIds,
+            quantidadeCapacidades = quantidade,
+            possuiCandidata = quantidade > 0
+        )
+    }
     fun analisar(
         requisito: AdaRequirement,
         capacidades: List<AdaCapability>
