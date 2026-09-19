@@ -48,7 +48,27 @@ private const val BACKUP_FILE_NAME = "adalink_reservoir_backup.json"
             array.toString()
         )
     }
+private fun salvar(
+    context: Context,
+    array: JSONArray
+) {
+    val principal = file(context)
+    val backup = File(
+        context.filesDir,
+        BACKUP_FILE_NAME
+    )
 
+    if (principal.exists()) {
+        principal.copyTo(
+            backup,
+            overwrite = true
+        )
+    }
+
+    principal.writeText(
+        array.toString()
+    )
+}
     fun armazenar(
         context: Context,
         source: String,
