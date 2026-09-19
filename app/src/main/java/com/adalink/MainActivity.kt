@@ -73,6 +73,17 @@ class MainActivity : Activity() {
                 Toast.LENGTH_LONG
             ).show()
         }
+                val packetEngine = Button(this)
+        packetEngine.text = "⚙️ ADA PACKET ENGINE"
+        tela.addView(packetEngine)
+
+        packetEngine.setOnClickListener {
+            Toast.makeText(
+                this,
+                PacketEngine.resumo(this),
+                Toast.LENGTH_LONG
+            ).show()
+        }
         val radio = Button(this)
         radio.text = "📡 RADIO ENVIRONMENT"
         tela.addView(radio)
