@@ -137,11 +137,7 @@ private fun salvar(
         }
     }
 
-        fun limpar(
-        context: Context
-    ) {
-        file(context).delete()
-    }
+
 
     fun dadosDoReservatorio(
         context: Context
