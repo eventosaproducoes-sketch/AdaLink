@@ -48,6 +48,21 @@ object MathematicalEngine {
             capacidade.id
         }
         }
+            fun resumoCapacidades(
+        capacidades: List<AdaCapability>
+    ): String {
+
+        val ids = idsDasCapacidades(capacidades)
+
+        return buildString {
+            append("🧮 ADA MATHEMATICAL ENGINE\n\n")
+            append("CAPACIDADES RECEBIDAS: ${ids.size}\n\n")
+
+            ids.forEach { id ->
+                append("$id\n")
+            }
+        }
+            }
     fun analisar(
         requisito: AdaRequirement,
         capacidades: List<AdaCapability>
