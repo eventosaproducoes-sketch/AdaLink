@@ -5,9 +5,12 @@ import android.app.Activity
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.*
-import android.os.Bundle
 import android.os.Handler
+import android.content.Intent
 import android.widget.*
+import android.os.Bundle
+
+
 
 class MainActivity : Activity() {
 
@@ -46,7 +49,19 @@ class MainActivity : Activity() {
                 Toast.LENGTH_LONG
             ).show()
         }
+        val backup = Button(this)
+        backup.text = "🔐 BACKUP ADA RESERVOIR"
+        tela.addView(backup)
 
+        backup.setOnClickListener {
+            val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
+            intent.type = "application/json"
+            intent.putExtra(
+                Intent.EXTRA_TITLE,
+                "AdaReservoir_Backup.json"
+            )
+            startActivityForResult(intent, 2001)
+        }
         val energia = Button(this)
         energia.text = "⚡ DIAGNÓSTICO DE ENERGIA"
         tela.addView(energia)
@@ -181,4 +196,49 @@ lm.registerGnssMeasurementsCallback(
             info.text = "⚠️ Permissão GNSS não autorizada"
         }
     }
+        override fun onActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?
+    ) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == 2001 &&
+            resultCode == RESULT_OK
+        ) {
+            val uri = data?.data
+
+            if (uri != null) {
+                try {
+                    val conteudo =
+                        DataReservoir.dadosDoReservatorio(this)
+
+                    contentResolver
+                        .openOutputStream(uri)
+                        ?.use { saida ->
+                            saida.write(
+                                conteudo.toByteArray(
+                                    Charsets.UTF_8
+                                )
+                            )
+                        }
+
+                    Toast.makeText(
+                        this,
+                        "🔐 BACKUP CRIADO\n" +
+                        "Pacotes: ${DataReservoir.quantidade(this)}\n" +
+                        "Dados: ${DataReservoir.tamanhoTotal(this)} bytes",
+                        Toast.LENGTH_LONG
+                    ).show()
+
+                } catch (e: Exception) {
+                    Toast.makeText(
+                        this,
+                        "⚠️ Erro ao criar backup",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+        }
+        }
 }
