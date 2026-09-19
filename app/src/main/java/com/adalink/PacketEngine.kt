@@ -85,7 +85,7 @@ object PacketEngine {
 
             Pacotes preservados: ${r.pacotes}
             Dados preservados: ${r.bytes} bytes
-$dadoFormatados
+$dadosFormatados
             Fontes identificadas: ${r.fontes}
             Tipos identificados: ${r.tipos}
 
