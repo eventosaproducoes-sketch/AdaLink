@@ -12,7 +12,19 @@ data class AdaMathematicalResult(
     val status: AdaRequirementStatus,
     val capacidades: List<String>,
     val justificativa: String
+    )
+    data class AdaCompatibilityInput(
+    val requisitoId: String,
+    val capacidadeIds: List<String>
 )
+
+data class AdaCompatibilityResult(
+    val requisitoId: String,
+    val capacidadeIds: List<String>,
+    val quantidadeCapacidades: Int,
+    val possuiCandidata: Boolean
+)
+
 
 object MathematicalEngine {
 
