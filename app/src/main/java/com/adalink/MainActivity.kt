@@ -1,6 +1,7 @@
 package com.adalink
 
 import android.Manifest
+import android.app.AlertDialog
 import android.app.Activity
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -95,6 +96,19 @@ class MainActivity : Activity() {
         Toast.LENGTH_LONG
         ).show()
        }
+                val capabilityMap = Button(this)
+        capabilityMap.text = "🧠 ADA CAPABILITY MAP"
+        tela.addView(capabilityMap)
+
+        capabilityMap.setOnClickListener {
+            val relatorio = CapabilityMap.relatorio(this@MainActivity)
+
+            AlertDialog.Builder(this@MainActivity)
+                .setTitle("🧠 ADA CAPABILITY MAP")
+                .setMessage(relatorio)
+                .setPositiveButton("FECHAR", null)
+                .show()
+        }
         info = TextView(this)
         info.textSize = 14f
         info.setTextColor(Color.WHITE)
