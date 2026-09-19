@@ -40,13 +40,7 @@ private const val BACKUP_FILE_NAME = "adalink_reservoir_backup.json"
         }
     }
 
-    private fun salvar(
-        context: Context,
-        array: JSONArray
-    ) {
-        file(context).writeText(
-            array.toString()
-        )
+    
     }
 private fun salvar(
     context: Context,
