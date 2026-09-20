@@ -63,7 +63,26 @@ object MathematicalEngine {
             }
         }
             }
+                fun capacidadesCandidatas(
+        requisitoId: String
+    ): List<String> {
+
+        return when (requisitoId) {
+            "R001" -> listOf("C016")
+            "R002" -> listOf("C016")
+            "R003" -> listOf("C016")
+            "R004" -> listOf("C001", "C013")
+            "R005" -> listOf("C012")
+            "R006" -> emptyList()
+            "R007" -> listOf("C016", "C011")
+            "R008" -> listOf("C013")
+            "R009" -> listOf("C012")
+            "R010" -> emptyList()
+            else -> emptyList()
+        }
+                }
     fun analisar(
+            
         requisito: AdaRequirement,
         capacidades: List<AdaCapability>
     ): AdaMathematicalResult {
