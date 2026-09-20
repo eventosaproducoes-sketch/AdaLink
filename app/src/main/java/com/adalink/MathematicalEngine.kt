@@ -81,6 +81,28 @@ object MathematicalEngine {
             else -> emptyList()
         }
                 }
+                    fun resumoCandidatas(
+        requisitos: List<AdaRequirement>
+    ): String {
+
+        return buildString {
+            append("🧩 ADA COMPATIBILITY RULES\n\n")
+
+            requisitos.forEach { requisito ->
+                val candidatas = capacidadesCandidatas(requisito.id)
+
+                append("${requisito.id} → ")
+
+                if (candidatas.isEmpty()) {
+                    append("NENHUMA CANDIDATA")
+                } else {
+                    append(candidatas.joinToString(" + "))
+                }
+
+                append("\n")
+            }
+        }
+                    }
     fun analisar(
             
         requisito: AdaRequirement,
