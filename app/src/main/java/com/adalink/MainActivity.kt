@@ -134,7 +134,19 @@ mathematicalEngine.setOnClickListener {
         .setPositiveButton("FECHAR", null)
         .show()
 }
+val reservoirRate = Button(this)
+reservoirRate.text = "📊 ADA RESERVOIR RATE"
+tela.addView(reservoirRate)
 
+reservoirRate.setOnClickListener {
+    val resultado = AdaReservoirRate.medir(this@MainActivity)
+
+    AlertDialog.Builder(this@MainActivity)
+        .setTitle("📊 ADA RESERVOIR RATE")
+        .setMessage(resultado)
+        .setPositiveButton("FECHAR", null)
+        .show()
+}
                 val requirementMatrix = Button(this)
         requirementMatrix.text = "🧩 ADA REQUIREMENT MATRIX"
         tela.addView(requirementMatrix)
