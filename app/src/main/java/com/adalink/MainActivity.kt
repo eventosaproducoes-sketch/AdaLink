@@ -147,6 +147,19 @@ reservoirRate.setOnClickListener {
         .setPositiveButton("FECHAR", null)
         .show()
 }
+val reservoirSources = Button(this)
+reservoirSources.text = "🔎 ADA RESERVOIR SOURCES"
+tela.addView(reservoirSources)
+
+reservoirSources.setOnClickListener {
+    val resultado = AdaReservoirSources.analisar(this@MainActivity)
+
+    AlertDialog.Builder(this@MainActivity)
+        .setTitle("🔎 ADA RESERVOIR SOURCES")
+        .setMessage(resultado)
+        .setPositiveButton("FECHAR", null)
+        .show()
+}
                 val requirementMatrix = Button(this)
         requirementMatrix.text = "🧩 ADA REQUIREMENT MATRIX"
         tela.addView(requirementMatrix)
