@@ -60,6 +60,7 @@ class MainActivity : Activity() {
             intent.putExtra(
                 Intent.EXTRA_TITLE,
                 "AdaReservoir_Backup.json"
+                
             )
             startActivityForResult(intent, 2001)
         }
@@ -159,6 +160,20 @@ reservoirSources.setOnClickListener {
         .setMessage(resultado)
         .setPositiveButton("FECHAR", null)
         .show()
+}   
+val gnssPacketInspector = Button(this)
+gnssPacketInspector.text = "🔎 ADA GNSS PACKET INSPECTOR"
+tela.addView(gnssPacketInspector)
+
+gnssPacketInspector.setOnClickListener {
+    val resultado = AdaGnssPacketInspector.inspecionar(this@MainActivity)
+
+    AlertDialog.Builder(this@MainActivity)
+        .setTitle("🔎 ADA GNSS PACKET INSPECTOR")
+        .setMessage(resultado)
+        .setPositiveButton("FECHAR", null)
+        .show()
+}
 }
                 val requirementMatrix = Button(this)
         requirementMatrix.text = "🧩 ADA REQUIREMENT MATRIX"
