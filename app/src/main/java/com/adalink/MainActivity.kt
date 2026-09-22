@@ -174,7 +174,7 @@ gnssPacketInspector.setOnClickListener {
         .setPositiveButton("FECHAR", null)
         .show()
 }
-}
+
                 val requirementMatrix = Button(this)
         requirementMatrix.text = "🧩 ADA REQUIREMENT MATRIX"
         tela.addView(requirementMatrix)
