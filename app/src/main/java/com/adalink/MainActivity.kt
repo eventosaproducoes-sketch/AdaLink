@@ -23,7 +23,8 @@ class MainActivity : Activity() {
     private var ultimoRaw = ""
     override fun onCreate(b: Bundle?) {
         super.onCreate(b)
-    
+        
+        val scroll = ScrollView(this)
         val tela = LinearLayout(this)
         tela.orientation = LinearLayout.VERTICAL
         tela.setPadding(20, 20, 20, 20)
@@ -195,7 +196,9 @@ gnssPacketInspector.setOnClickListener {
         tela.addView(requirementMatrix)
 
         requirementMatrix.setOnClickListener {
-            AlertDialog.Builder(this@MainActivity)
+         
+              
+             AlertDialog.Builder(this@MainActivity)
                 .setTitle("🧩 ADA REQUIREMENT MATRIX")
                 .setMessage(RequirementMatrix.resumo())
                 .setPositiveButton("FECHAR", null)
@@ -206,8 +209,8 @@ gnssPacketInspector.setOnClickListener {
         info.setTextColor(Color.WHITE)
         info.text = "🔎 Iniciando Ray-X..."
         tela.addView(info)
-
-        setContentView(tela)
+scroll.addView(tela)
+setContentView(scroll)
 
         lm = getSystemService(LOCATION_SERVICE) as LocationManager
 
