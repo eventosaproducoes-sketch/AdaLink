@@ -168,7 +168,7 @@ tela.addView(gnssPacketInspector)
 gnssPacketInspector.setOnClickListener {
     val resultado = AdaGnssPacketInspector.inspecionar(this@MainActivity)
 
-       val scrollView = ScrollView(this@MainActivity)
+          val scrollView = ScrollView(this@MainActivity)
     val textoView = TextView(this@MainActivity)
 
     textoView.text = resultado
@@ -177,6 +177,14 @@ gnssPacketInspector.setOnClickListener {
     textoView.setPadding(20, 20, 20, 20)
 
     scrollView.addView(textoView)
+    scrollView.isFillViewport = true
+    scrollView.isVerticalScrollBarEnabled = true
+
+    val altura = (500 * resources.displayMetrics.density).toInt()
+    scrollView.layoutParams = android.view.ViewGroup.LayoutParams(
+        -1,
+        altura
+    )
 
     AlertDialog.Builder(this@MainActivity)
         .setTitle("🔎 ADA GNSS PACKET INSPECTOR")
