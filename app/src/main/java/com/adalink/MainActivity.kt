@@ -168,9 +168,19 @@ tela.addView(gnssPacketInspector)
 gnssPacketInspector.setOnClickListener {
     val resultado = AdaGnssPacketInspector.inspecionar(this@MainActivity)
 
+       val scrollView = ScrollView(this@MainActivity)
+    val textoView = TextView(this@MainActivity)
+
+    textoView.text = resultado
+    textoView.setTextColor(Color.BLACK)
+    textoView.textSize = 16f
+    textoView.setPadding(20, 20, 20, 20)
+
+    scrollView.addView(textoView)
+
     AlertDialog.Builder(this@MainActivity)
         .setTitle("🔎 ADA GNSS PACKET INSPECTOR")
-        .setMessage(resultado)
+        .setView(scrollView)
         .setPositiveButton("FECHAR", null)
         .show()
 }
