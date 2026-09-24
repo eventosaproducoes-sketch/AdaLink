@@ -167,33 +167,30 @@ tela.addView(gnssPacketInspector)
 
 gnssPacketInspector.setOnClickListener {
     val resultado = AdaGnssPacketInspector.inspecionar(this@MainActivity)
+        val scrollView = ScrollView(this@MainActivity)
+        val textoView = TextView(this@MainActivity)
 
-          val scrollView = ScrollView(this@MainActivity)
-    val textoView = TextView(this@MainActivity)
+        textoView.text = resultado
+        textoView.setTextColor(Color.BLACK)
+        textoView.textSize = 16f
+        textoView.setPadding(20, 20, 20, 20)
 
-    textoView.text = resultado
-    textoView.setTextColor(Color.BLACK)
-    textoView.textSize = 16f
-    textoView.setPadding(20, 20, 20, 20)
+        scrollView.addView(textoView)
 
-    scrollView.addView(textoView)
-    scrollView.isFillViewport = true
-    scrollView.isVerticalScrollBarEnabled = true
+        val dialog = AlertDialog.Builder(this@MainActivity)
+            .setTitle("🔎 ADA GNSS PACKET INSPECTOR")
+            .setView(scrollView)
+            .setPositiveButton("FECHAR", null)
+            .create()
 
-    val altura = (500 * resources.displayMetrics.density).toInt()
-    scrollView.layoutParams = android.view.ViewGroup.LayoutParams(
-        -1,
-        altura
-    )
+        dialog.show()
 
-    AlertDialog.Builder(this@MainActivity)
-        .setTitle("🔎 ADA GNSS PACKET INSPECTOR")
-        .setView(scrollView)
-        .setPositiveButton("FECHAR", null)
-        .show()
-}
-
-                val requirementMatrix = Button(this)
+        dialog.window?.setLayout(
+            -1,
+            (500 * resources.displayMetrics.density).toInt()
+        )
+               }     
+    val requirementMatrix = Button(this)
         requirementMatrix.text = "🧩 ADA REQUIREMENT MATRIX"
         tela.addView(requirementMatrix)
 
