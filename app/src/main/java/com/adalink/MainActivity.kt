@@ -190,6 +190,23 @@ adaCor.setOnClickListener {
         .setPositiveButton("FECHAR", null)
         .show()
 }
+val adaObservEner = Button(this)
+adaObservEner.text = "⚡ ADAOBSENER — OBSERVAR ENERGIA"
+tela.addView(adaObservEner)
+
+adaObservEner.setOnClickListener {
+
+    val resultado =
+        AdaObservEner.sensoresDisponiveis(
+            this@MainActivity
+        )
+
+    AlertDialog.Builder(this@MainActivity)
+        .setTitle("⚡ ADAOBSENER")
+        .setMessage(resultado)
+        .setPositiveButton("FECHAR", null)
+        .show()
+}
 val adaFunV = Button(this)
 adaFunV.text = "✅ ADAFUNV — VALIDAR F001"
 tela.addView(adaFunV)
