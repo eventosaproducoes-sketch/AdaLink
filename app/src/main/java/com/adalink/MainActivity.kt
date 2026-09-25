@@ -141,7 +141,7 @@ reservoirRate.text = "📊 ADA RESERVOIR RATE"
 tela.addView(reservoirRate)
 
 reservoirRate.setOnClickListener {
-    val resultado = AdaReservoirRate.medir(this@MainActivity)
+val resultado = AdaReservoirRate.medir(this@MainActivity)
 
     AlertDialog.Builder(this@MainActivity)
         .setTitle("📊 ADA RESERVOIR RATE")
