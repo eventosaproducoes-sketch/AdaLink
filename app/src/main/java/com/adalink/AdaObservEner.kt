@@ -205,4 +205,71 @@ object AdaObservEner {
             )
         }
     }
+        fun diagnosticoEnergetico(context: Context): String {
+
+        val bateria =
+            lerBateria(context)
+
+        val sensores =
+            sensoresDisponiveis(context)
+
+        return buildString {
+
+            append("⚡ ADAOBSENER\n\n")
+            append("DIAGNÓSTICO ENERGÉTICO INTERNO\n\n")
+
+            append("BATERIA\n")
+            append("Nível: ")
+            append(
+                bateria.nivelBateriaPercentual
+                    ?.let { "$it%" }
+                    ?: "NÃO DISPONÍVEL"
+            )
+            append("\n")
+
+            append("Temperatura: ")
+            append(
+                bateria.temperaturaBateriaCelsius
+                    ?.let { "$it °C" }
+                    ?: "NÃO DISPONÍVEL"
+            )
+            append("\n")
+
+            append("Tensão: ")
+            append(
+                bateria.voltagemBateriaMilivolts
+                    ?.let { "$it mV" }
+                    ?: "NÃO DISPONÍVEL"
+            )
+            append("\n")
+
+            append("Corrente: ")
+            append(
+                bateria.correnteBateriaMicroampere
+                    ?.let { "$it µA" }
+                    ?: "NÃO DISPONÍVEL"
+            )
+            append("\n")
+
+            append("Contador de energia: ")
+            append(
+                bateria.energiaBateriaNanonWh
+                    ?.let { "$it nWh" }
+                    ?: "NÃO DISPONÍVEL"
+            )
+            append("\n")
+
+            append("Carregando: ")
+            append(
+                if (bateria.carregando) "SIM" else "NÃO"
+            )
+            append("\n\n")
+
+            append("SENSORES INTERNOS\n\n")
+            append(sensores)
+
+            append("\n\nPRESERVAÇÃO\n")
+            append("Nenhum dado do DataReservoir é apagado por esta observação.")
+        }
+    }
 }
