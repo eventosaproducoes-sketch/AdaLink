@@ -136,7 +136,23 @@ mathematicalEngine.setOnClickListener {
         .setPositiveButton("FECHAR", null)
         .show()
 }
-val reservoirRate = Button(this)
+    val compatibilityRules = Button(this)
+    compatibilityRules.text = "🧩 ADA COMPATIBILITY RULES"
+    tela.addView(compatibilityRules)
+
+    compatibilityRules.setOnClickListener {
+        val requisitos = RequirementModel.requisitos()
+
+        val resultado =
+            MathematicalEngine.resumoCandidatas(requisitos)
+
+        AlertDialog.Builder(this@MainActivity)
+            .setTitle("🧩 ADA COMPATIBILITY RULES")
+            .setMessage(resultado)
+            .setPositiveButton("FECHAR", null)
+            .show()
+    }
+        val reservoirRate = Button(this)
 reservoirRate.text = "📊 ADA RESERVOIR RATE"
 tela.addView(reservoirRate)
 
