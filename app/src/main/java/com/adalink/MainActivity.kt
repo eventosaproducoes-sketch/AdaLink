@@ -172,6 +172,24 @@ fusionEngine.setOnClickListener {
         .setPositiveButton("FECHAR", null)
         .show()
 }
+val adaCor = Button(this)
+adaCor.text = "🧠 ADACOR"
+tela.addView(adaCor)
+
+adaCor.setOnClickListener {
+
+    val resultado =
+        AdaCor.resumo(
+            this@MainActivity,
+            "R004"
+        )
+
+    AlertDialog.Builder(this@MainActivity)
+        .setTitle("🧠 ADACOR")
+        .setMessage(resultado)
+        .setPositiveButton("FECHAR", null)
+        .show()
+}
         val reservoirRate = Button(this)
 reservoirRate.text = "📊 ADA RESERVOIR RATE"
 tela.addView(reservoirRate)
