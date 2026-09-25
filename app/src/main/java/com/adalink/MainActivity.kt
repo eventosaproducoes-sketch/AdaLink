@@ -158,7 +158,7 @@ tela.addView(fusionEngine)
 
 fusionEngine.setOnClickListener {
 
-    val capacidades = CapabilityMap.map(this@MainActivity)
+    val capacidades = CapabilityMap.mapear(this@MainActivity)
 
     val resultado =
         AdaFusionEngine.resumo(
