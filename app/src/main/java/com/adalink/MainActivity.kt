@@ -190,6 +190,34 @@ adaCor.setOnClickListener {
         .setPositiveButton("FECHAR", null)
         .show()
 }
+val adaFunV = Button(this)
+adaFunV.text = "✅ ADAFUNV — VALIDAR F001"
+tela.addView(adaFunV)
+
+adaFunV.setOnClickListener {
+
+    val resultado =
+        AdaFunV.resumo(
+            this@MainActivity,
+            "R004"
+        )
+
+    val scrollView = ScrollView(this@MainActivity)
+    val textoView = TextView(this@MainActivity)
+
+    textoView.text = resultado
+    textoView.setTextColor(Color.WHITE)
+    textoView.textSize = 16f
+    textoView.setPadding(20, 20, 20, 20)
+
+    scrollView.addView(textoView)
+
+    AlertDialog.Builder(this@MainActivity)
+        .setTitle("✅ ADAFUNV — F001")
+        .setView(scrollView)
+        .setPositiveButton("FECHAR", null)
+        .show()
+}
         val reservoirRate = Button(this)
 reservoirRate.text = "📊 ADA RESERVOIR RATE"
 tela.addView(reservoirRate)
