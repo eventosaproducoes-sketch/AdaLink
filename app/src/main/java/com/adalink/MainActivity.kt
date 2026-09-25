@@ -152,6 +152,26 @@ mathematicalEngine.setOnClickListener {
             .setPositiveButton("FECHAR", null)
             .show()
     }
+       val fusionEngine = Button(this)
+fusionEngine.text = "🔗 ADA FUSION ENGINE"
+tela.addView(fusionEngine)
+
+fusionEngine.setOnClickListener {
+
+    val capacidades = CapabilityMap.map(this@MainActivity)
+
+    val resultado =
+        AdaFusionEngine.resumo(
+            "R004",
+            capacidades
+        )
+
+    AlertDialog.Builder(this@MainActivity)
+        .setTitle("🔗 ADA FUSION ENGINE")
+        .setMessage(resultado)
+        .setPositiveButton("FECHAR", null)
+        .show()
+}
         val reservoirRate = Button(this)
 reservoirRate.text = "📊 ADA RESERVOIR RATE"
 tela.addView(reservoirRate)
