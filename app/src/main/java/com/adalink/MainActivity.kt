@@ -206,7 +206,7 @@ adaFunV.setOnClickListener {
     val textoView = TextView(this@MainActivity)
 
     textoView.text = resultado
-    textoView.setTextColor(Color.WHITE)
+    textoView.setTextColor(Color.BLACK)
     textoView.textSize = 16f
     textoView.setPadding(20, 20, 20, 20)
 
