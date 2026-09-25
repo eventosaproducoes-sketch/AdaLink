@@ -1,158 +1,96 @@
 package com.adalink
 
-enum class AdaRequirementStatus {
-    ATENDIDO,
-    PARCIALMENTE_ATENDIDO,
-    NAO_ATENDIDO,
-    NAO_ANALISADO
-}
-
-data class AdaMathematicalResult(
+data class AdaFusionResult(
     val requisitoId: String,
-    val status: AdaRequirementStatus,
-    val capacidades: List<String>,
-    val justificativa: String
-    )
-    data class AdaCompatibilityInput(
-    val requisitoId: String,
-    val capacidadeIds: List<String>
+    val capacidadesDisponiveis: List<String>,
+    val capacidadesAusentes: List<String>,
+    val composicaoPossivel: Boolean,
+    val descricao: String
 )
 
-data class AdaCompatibilityResult(
-    val requisitoId: String,
-    val capacidadeIds: List<String>,
-    val quantidadeCapacidades: Int,
-    val possuiCandidata: Boolean
-)
+object AdaFusionEngine {
 
+    fun compor(
+        requisitoId: String,
+        capacidades: List<AdaCapability>
+    ): AdaFusionResult {
 
-object MathematicalEngine {
-    fun avaliarCandidatas(
-        entrada: AdaCompatibilityInput
-    ): AdaCompatibilityResult {
+        val candidatas =
+            MathematicalEngine.capacidadesCandidatas(requisitoId)
 
-        val quantidade = entrada.capacidadeIds.size
+        val disponiveis = capacidades
+            .map { it.id }
+            .filter { id -> candidatas.contains(id) }
 
-        return AdaCompatibilityResult(
-            requisitoId = entrada.requisitoId,
-            capacidadeIds = entrada.capacidadeIds,
-            quantidadeCapacidades = quantidade,
-            possuiCandidata = quantidade > 0
+        val ausentes = candidatas
+            .filter { id -> !disponiveis.contains(id) }
+
+        val possivel =
+            candidatas.isNotEmpty() &&
+            ausentes.isEmpty()
+
+        val descricao =
+            if (possivel) {
+                "Todas as capacidades candidatas estão disponíveis para composição."
+            } else if (disponiveis.isNotEmpty()) {
+                "Parte das capacidades candidatas está disponível. Composição ainda incompleta."
+            } else {
+                "Nenhuma capacidade candidata está disponível."
+            }
+
+        return AdaFusionResult(
+            requisitoId = requisitoId,
+            capacidadesDisponiveis = disponiveis,
+            capacidadesAusentes = ausentes,
+            composicaoPossivel = possivel,
+            descricao = descricao
         )
-    }
-        fun idsDasCapacidades(
-        capacidades: List<AdaCapability>
-    ): List<String> {
-
-        return capacidades.map { capacidade ->
-            capacidade.id
-        }
-        }
-            fun resumoCapacidades(
-        capacidades: List<AdaCapability>
-    ): String {
-
-        val ids = idsDasCapacidades(capacidades)
-
-        return buildString {
-            append("🧮 ADA MATHEMATICAL ENGINE\n\n")
-            append("CAPACIDADES RECEBIDAS: ${ids.size}\n\n")
-
-            ids.forEach { id ->
-                append("$id\n")
-            }
-        }
-            }
-                fun capacidadesCandidatas(
-        requisitoId: String
-    ): List<String> {
-
-        return when (requisitoId) {
-            "R001" -> listOf("C016")
-            "R002" -> listOf("C016")
-            "R003" -> listOf("C016")
-            "R004" -> listOf("C001", "C013")
-            "R005" -> listOf("C012")
-            "R006" -> emptyList()
-            "R007" -> listOf("C016", "C011")
-            "R008" -> listOf("C013")
-            "R009" -> listOf("C012")
-            "R010" -> emptyList()
-            else -> emptyList()
-        }
-                }
-                    fun resumoCandidatas(
-        requisitos: List<AdaRequirement>
-    ): String {
-
-        return buildString {
-            append("🧩 ADA COMPATIBILITY RULES\n\n")
-
-            requisitos.forEach { requisito ->
-                val candidatas = capacidadesCandidatas(requisito.id)
-
-                append("${requisito.id} → ")
-
-                if (candidatas.isEmpty()) {
-                    append("NENHUMA CANDIDATA")
-                } else {
-                    append(candidatas.joinToString(" + "))
-                }
-
-                append("\n")
-            }
-        }
-                    }
-    fun analisar(
-            
-        requisito: AdaRequirement,
-        capacidades: List<AdaCapability>
-    ): AdaMathematicalResult {
-
-        if (capacidades.isEmpty()) {
-            return AdaMathematicalResult(
-                requisitoId = requisito.id,
-                status = AdaRequirementStatus.NAO_ANALISADO,
-                capacidades = emptyList(),
-                justificativa = "Nenhuma capacidade foi fornecida para análise."
-            )
-        }
-
-        return AdaMathematicalResult(
-            requisitoId = requisito.id,
-            status = AdaRequirementStatus.NAO_ANALISADO,
-            capacidades = capacidades.map { it.id },
-            justificativa = "Regra de compatibilidade ainda não definida."
-        )
-    }
-
-    fun analisarTodos(
-        requisitos: List<AdaRequirement>,
-        capacidades: List<AdaCapability>
-    ): List<AdaMathematicalResult> {
-
-        return requisitos.map { requisito ->
-            analisar(requisito, capacidades)
-        }
     }
 
     fun resumo(
-        requisitos: List<AdaRequirement>,
+        requisitoId: String,
         capacidades: List<AdaCapability>
     ): String {
 
-        val resultados = analisarTodos(requisitos, capacidades)
+        val resultado = compor(
+            requisitoId,
+            capacidades
+        )
 
         return buildString {
-            append("🧮 ADA MATHEMATICAL ENGINE\n\n")
-            append("Requisitos analisados: ${resultados.size}\n")
-            append("Capacidades fornecidas: ${capacidades.size}\n\n")
+            append("🔗 ADA FUSION ENGINE\n\n")
+            append("REQUISITO: ${resultado.requisitoId}\n\n")
 
-            resultados.forEach { resultado ->
-                append("${resultado.requisitoId} → ")
-                append("${resultado.status}\n")
-                append("${resultado.justificativa}\n\n")
+            append("CAPACIDADES DISPONÍVEIS:\n")
+
+            if (resultado.capacidadesDisponiveis.isEmpty()) {
+                append("NENHUMA\n")
+            } else {
+                resultado.capacidadesDisponiveis.forEach {
+                    append("$it\n")
+                }
             }
+
+            append("\nCAPACIDADES AUSENTES:\n")
+
+            if (resultado.capacidadesAusentes.isEmpty()) {
+                append("NENHUMA\n")
+            } else {
+                resultado.capacidadesAusentes.forEach {
+                    append("$it\n")
+                }
+            }
+
+            append("\nCOMPOSIÇÃO POSSÍVEL: ")
+            append(
+                if (resultado.composicaoPossivel)
+                    "SIM"
+                else
+                    "NÃO"
+            )
+
+            append("\n\n")
+            append(resultado.descricao)
         }
     }
 }
