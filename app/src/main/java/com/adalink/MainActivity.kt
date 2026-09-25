@@ -197,7 +197,7 @@ tela.addView(adaObservEner)
 adaObservEner.setOnClickListener {
 
     val resultado =
-        AdaObservEner.sensoresDisponiveis(
+        AdaObservEner.diagnosticoEnergetico(
             this@MainActivity
         )
 
