@@ -207,6 +207,36 @@ adaObservEner.setOnClickListener {
         .setPositiveButton("FECHAR", null)
         .show()
 }
+val adaEnergLab = Button(this)
+adaEnergLab.text = "⚡ ADAENERGLAB — PESQUISA DE AUTONOMIA"
+tela.addView(adaEnergLab)
+
+adaEnergLab.setOnClickListener {
+
+    val resultado =
+        AdaEnergLab.relatorio(
+            this@MainActivity
+        )
+
+    val scrollView =
+        ScrollView(this@MainActivity)
+
+    val textoView =
+        TextView(this@MainActivity)
+
+    textoView.text = resultado
+    textoView.setTextColor(Color.BLACK)
+    textoView.textSize = 16f
+    textoView.setPadding(20, 20, 20, 20)
+
+    scrollView.addView(textoView)
+
+    AlertDialog.Builder(this@MainActivity)
+        .setTitle("⚡ ADAENERGLAB")
+        .setView(scrollView)
+        .setPositiveButton("FECHAR", null)
+        .show()
+}
 val adaFunV = Button(this)
 adaFunV.text = "✅ ADAFUNV — VALIDAR F001"
 tela.addView(adaFunV)
