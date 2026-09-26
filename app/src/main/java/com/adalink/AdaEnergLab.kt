@@ -660,7 +660,7 @@ object AdaEnergLab {
             append(
                 "Recuperação de energia: ${
                     if (
-                        resultado.recuperacaoDemonstrada
+                resultado.recuperacaoEnergiaDemonstrada
                     ) "SIM" else "NÃO DEMONSTRADA"
                 }\n"
             )
