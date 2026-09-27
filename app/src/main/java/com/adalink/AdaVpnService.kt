@@ -1,4 +1,4 @@
-package SEU_PACOTE
+package com.adalink
 
 import android.app.Notification
 import android.app.NotificationChannel
