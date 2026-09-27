@@ -180,14 +180,21 @@ class AdaVpnService : VpnService() {
              */
 
             val tun =
-                builder.establish()
+    builder.establish()
 
-            if (tun == null) {
+if (tun == null) {
 
-                interfaceCriada = false
+    interfaceCriada = false
+    executando.set(false)
 
-                return
-            }
+    android.util.Log.e(
+        "AdaLinkVPN",
+        "ERRO: Builder.establish() retornou null"
+    )
+
+    return
+}
+               
 
             tunInterface = tun
 
@@ -201,6 +208,15 @@ class AdaVpnService : VpnService() {
                 FileOutputStream(descriptor)
 
             interfaceCriada = true
+        android.util.Log.i(
+    "AdaLinkVPN",
+    "TUN CRIADO COM SUCESSO"
+)
+
+android.util.Log.i(
+    "AdaLinkVPN",
+    "IP INTERNO: $VPN_ADDRESS/$VPN_PREFIX"
+)
 
             executando.set(true)
 
