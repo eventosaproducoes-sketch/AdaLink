@@ -558,10 +558,6 @@ lm.registerGnssMeasurementsCallback(
             "🔌 VPN autorizada. Iniciando TUN...",
             Toast.LENGTH_LONG
         ).show()
-    }
-}
                 }
             }
-        }
-        }
-}
+            }       
