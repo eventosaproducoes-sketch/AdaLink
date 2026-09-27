@@ -600,7 +600,6 @@ private fun verificarConnectivityLab(
                 Toast.LENGTH_LONG
             ).show()
         }
-
     }, 1000)
 }
-        
+}       
