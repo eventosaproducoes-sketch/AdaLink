@@ -10,7 +10,7 @@ import android.os.Handler
 import android.content.Intent
 import android.widget.*
 import android.os.Bundle
-
+import android.net.VpnService
 
 
 class MainActivity : Activity() {
@@ -333,6 +333,41 @@ gnssPacketInspector.setOnClickListener {
                 .setPositiveButton("FECHAR", null)
                 .show()
         }
+                val connectivityLab = Button(this)
+        connectivityLab.text = "🔌 ADALINK CONNECTIVITY LAB"
+        tela.addView(connectivityLab)
+
+        connectivityLab.setOnClickListener {
+
+            val intent = VpnService.prepare(this@MainActivity)
+
+            if (intent != null) {
+
+                startActivityForResult(
+                    intent,
+                    3001
+                )
+
+            } else {
+
+                val serviceIntent =
+                    Intent(
+                        this@MainActivity,
+                        AdaVpnService::class.java
+                    )
+
+                serviceIntent.action =
+                    AdaVpnService.ACTION_START
+
+                startService(serviceIntent)
+
+                Toast.makeText(
+                    this@MainActivity,
+                    "🔌 Iniciando AdaLink Connectivity Lab...",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
         info = TextView(this)
         info.textSize = 14f
         info.setTextColor(Color.WHITE)
@@ -445,47 +480,86 @@ lm.registerGnssMeasurementsCallback(
             info.text = "⚠️ Permissão GNSS não autorizada"
         }
     }
-        override fun onActivityResult(
-        requestCode: Int,
-        resultCode: Int,
-        data: Intent?
+    override fun onActivityResult(
+    requestCode: Int,
+    resultCode: Int,
+    data: Intent?
+) {
+    super.onActivityResult(requestCode, resultCode, data)
+
+    // ==============================
+    // BACKUP ADA RESERVOIR
+    // ==============================
+
+    if (requestCode == 2001 &&
+        resultCode == RESULT_OK
     ) {
-        super.onActivityResult(requestCode, resultCode, data)
 
-        if (requestCode == 2001 &&
-            resultCode == RESULT_OK
-        ) {
-            val uri = data?.data
+        val uri = data?.data
 
-            if (uri != null) {
-                try {
-                    val conteudo =
-                        DataReservoir.dadosDoReservatorio(this)
+        if (uri != null) {
 
-                    contentResolver
-                        .openOutputStream(uri)
-                        ?.use { saida ->
-                            saida.write(
-                                conteudo.toByteArray(
-                                    Charsets.UTF_8
-                                )
+            try {
+
+                val conteudo =
+                    DataReservoir.dadosDoReservatorio(this)
+
+                contentResolver
+                    .openOutputStream(uri)
+                    ?.use { saida ->
+
+                        saida.write(
+                            conteudo.toByteArray(
+                                Charsets.UTF_8
                             )
-                        }
+                        )
+                    }
 
-                    Toast.makeText(
-                        this,
-                        "🔐 BACKUP CRIADO\n" +
-                        "Pacotes: ${DataReservoir.quantidade(this)}\n" +
-                        "Dados: ${DataReservoir.tamanhoTotal(this)} bytes",
-                        Toast.LENGTH_LONG
-                    ).show()
+                Toast.makeText(
+                    this,
+                    "🔐 BACKUP CRIADO\n" +
+                            "Pacotes: ${DataReservoir.quantidade(this)}\n" +
+                            "Dados: ${DataReservoir.tamanhoTotal(this)} bytes",
+                    Toast.LENGTH_LONG
+                ).show()
 
-                } catch (e: Exception) {
-                    Toast.makeText(
-                        this,
-                        "⚠️ Erro ao criar backup",
-                        Toast.LENGTH_LONG
-                    ).show()
+            } catch (e: Exception) {
+
+                Toast.makeText(
+                    this,
+                    "⚠️ Erro ao criar backup",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+    }
+
+    // ==============================
+    // ADALINK CONNECTIVITY LAB
+    // ==============================
+
+    if (requestCode == 3001 &&
+        resultCode == RESULT_OK
+    ) {
+
+        val serviceIntent =
+            Intent(
+                this@MainActivity,
+                AdaVpnService::class.java
+            )
+
+        serviceIntent.action =
+            AdaVpnService.ACTION_START
+
+        startService(serviceIntent)
+
+        Toast.makeText(
+            this@MainActivity,
+            "🔌 VPN autorizada. Iniciando TUN...",
+            Toast.LENGTH_LONG
+        ).show()
+    }
+}
                 }
             }
         }
