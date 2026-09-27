@@ -212,7 +212,11 @@ if (tun == null) {
     "AdaLinkVPN",
     "TUN CRIADO COM SUCESSO"
 )
-
+android.util.Log.e(
+    "AdaLinkVPN",
+    "EXCEÇÃO AO CRIAR TUN",
+    e
+)
 android.util.Log.i(
     "AdaLinkVPN",
     "IP INTERNO: $VPN_ADDRESS/$VPN_PREFIX"
@@ -223,7 +227,11 @@ android.util.Log.i(
             iniciarLeitura()
 
         } catch (e: Exception) {
-
+android.util.Log.e(
+    "AdaLinkVPN",
+    "EXCEÇÃO AO CRIAR TUN",
+    e
+)
             interfaceCriada = false
 
             executando.set(false)
