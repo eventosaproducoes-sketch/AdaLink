@@ -150,98 +150,99 @@ class AdaVpnService : VpnService() {
 
         return START_NOT_STICKY
     }
+private fun criarInterfaceTun() {
 
-    private fun criarInterfaceTun() {
+    if (interfaceCriada) {
+        return
+    }
 
-        if (interfaceCriada) {
+    try {
+
+        val builder =
+            Builder()
+                .setSession("AdaLink Connectivity Lab")
+                .addAddress(
+                    VPN_ADDRESS,
+                    VPN_PREFIX
+                )
+
+        /*
+         * IMPORTANTE:
+         *
+         * Não adicionamos:
+         *
+         * addRoute("0.0.0.0", 0)
+         *
+         * Portanto o laboratório não assume
+         * automaticamente todo o tráfego
+         * de Internet do aparelho.
+         */
+
+        val tun =
+            builder.establish()
+
+        if (tun == null) {
+
+            interfaceCriada = false
+            executando.set(false)
+
+            android.util.Log.e(
+                "AdaLinkVPN",
+                "ERRO: Builder.establish() retornou null"
+            )
+
             return
         }
 
-        try {
+        tunInterface = tun
 
-            val builder =
-                Builder()
-                    .setSession("AdaLink Connectivity Lab")
-                    .addAddress(
-                        VPN_ADDRESS,
-                        VPN_PREFIX
-                    )
+        val descriptor =
+            tun.fileDescriptor
 
-            /*
-             * IMPORTANTE:
-             *
-             * Não adicionamos:
-             *
-             * addRoute("0.0.0.0", 0)
-             *
-             * Portanto o laboratório não assume
-             * automaticamente todo o tráfego
-             * de Internet do aparelho.
-             */
+        tunInput =
+            FileInputStream(descriptor)
 
-            val tun =
-    builder.establish()
+        tunOutput =
+            FileOutputStream(descriptor)
 
-if (tun == null) {
+        interfaceCriada = true
 
-    interfaceCriada = false
-    executando.set(false)
-
-    android.util.Log.e(
-        "AdaLinkVPN",
-        "ERRO: Builder.establish() retornou null"
-    )
-
-    return
-}
-               
-
-            tunInterface = tun
-
-            val descriptor =
-                tun.fileDescriptor
-
-            tunInput =
-                FileInputStream(descriptor)
-
-            tunOutput =
-                FileOutputStream(descriptor)
-
-            interfaceCriada = true
         android.util.Log.i(
-    "AdaLinkVPN",
-    "TUN CRIADO COM SUCESSO"
-)
+            "AdaLinkVPN",
+            "TUN CRIADO COM SUCESSO"
+        )
 
-android.util.Log.i(
-    "AdaLinkVPN",
-    "IP INTERNO: $VPN_ADDRESS/$VPN_PREFIX"
-)
+        android.util.Log.i(
+            "AdaLinkVPN",
+            "IP INTERNO: $VPN_ADDRESS/$VPN_PREFIX"
+        )
 
-            executando.set(true)
+        executando.set(true)
 
-            iniciarLeitura()
+        iniciarLeitura()
 
-        } catch (e: Exception) {
-android.util.Log.e(
-    "AdaLinkVPN",
-    "EXCEÇÃO AO CRIAR TUN",
-    e
-)
-            interfaceCriada = false
+    } catch (e: Exception) {
 
-            executando.set(false)
+        android.util.Log.e(
+            "AdaLinkVPN",
+            "EXCEÇÃO AO CRIAR TUN",
+            e
+        )
 
+        interfaceCriada = false
+
+        executando.set(false)
+
+        try {
             tunInterface?.close()
-
-            tunInterface = null
-
-            tunInput = null
-
-            tunOutput = null
+        } catch (_: Exception) {
         }
-    }
 
+        tunInterface = null
+        tunInput = null
+        tunOutput = null
+    }
+}
     private fun iniciarLeitura() {
 
         if (threadLeitura != null) {
