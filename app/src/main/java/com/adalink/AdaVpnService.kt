@@ -273,6 +273,38 @@ private fun criarInterfaceTun() {
 
                             bytesLidos +=
                                 quantidade.toLong()
+                                                        val pacote =
+                            buffer.array()
+                                .copyOfRange(
+                                    0,
+                                    quantidade
+                                )
+
+                        if (pacote.size >= 20) {
+
+                            val versao =
+                                (pacote[0].toInt() ushr 4) and 0x0F
+
+                            if (versao == 4) {
+
+                                val protocolo =
+                                    pacote[9].toInt() and 0xFF
+
+                                val destino =
+                                    "${pacote[16].toInt() and 0xFF}." +
+                                    "${pacote[17].toInt() and 0xFF}." +
+                                    "${pacote[18].toInt() and 0xFF}." +
+                                    "${pacote[19].toInt() and 0xFF}"
+
+                                android.util.Log.i(
+                                    "AdaLinkVPN",
+                                    "PACOTE IPv4 RECEBIDO | " +
+                                    "bytes=${pacote.size} | " +
+                                    "protocolo=$protocolo | " +
+                                    "destino=$destino"
+                                )
+                            }
+                        }
                         }
 
                     } catch (e: Exception) {
