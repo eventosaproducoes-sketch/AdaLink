@@ -1,0 +1,441 @@
+package SEU_PACOTE
+
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Intent
+import android.net.VpnService
+import android.os.Build
+import android.os.IBinder
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.nio.ByteBuffer
+import java.util.concurrent.atomic.AtomicBoolean
+
+class AdaVpnService : VpnService() {
+
+    companion object {
+
+        const val ACTION_START =
+            "ADALINK_VPN_START"
+
+        const val ACTION_STOP =
+            "ADALINK_VPN_STOP"
+
+        const val ACTION_STATUS =
+            "ADALINK_VPN_STATUS"
+
+        private const val CHANNEL_ID =
+            "ADALINK_VPN_CHANNEL"
+
+        private const val NOTIFICATION_ID =
+            41001
+
+        private const val VPN_ADDRESS =
+            "10.77.0.1"
+
+        private const val VPN_PREFIX =
+            24
+
+        @Volatile
+        var tunInterface =
+            null as android.os.ParcelFileDescriptor?
+
+        @Volatile
+        var tunInput =
+            null as FileInputStream?
+
+        @Volatile
+        var tunOutput =
+            null as FileOutputStream?
+
+        @Volatile
+        var interfaceCriada =
+            false
+
+        @Volatile
+        var ipInterno =
+            VPN_ADDRESS
+
+        @Volatile
+        var pacotesLidos =
+            0
+
+        @Volatile
+        var pacotesEscritos =
+            0
+
+        @Volatile
+        var bytesLidos =
+            0L
+
+        @Volatile
+        var bytesEscritos =
+            0L
+
+        private val executando =
+            AtomicBoolean(false)
+
+        fun estaExecutando(): Boolean {
+            return executando.get()
+        }
+
+        fun status(): String {
+
+            return buildString {
+
+                appendLine("ADALINK VPN/TUN")
+                appendLine()
+                appendLine(
+                    "Executando: ${executando.get()}"
+                )
+                appendLine(
+                    "Interface criada: $interfaceCriada"
+                )
+                appendLine(
+                    "IP interno: $ipInterno"
+                )
+                appendLine(
+                    "Pacotes lidos: $pacotesLidos"
+                )
+                appendLine(
+                    "Pacotes escritos: $pacotesEscritos"
+                )
+                appendLine(
+                    "Bytes lidos: $bytesLidos"
+                )
+                appendLine(
+                    "Bytes escritos: $bytesEscritos"
+                )
+            }
+        }
+    }
+
+    private var threadLeitura: Thread? = null
+
+    override fun onCreate() {
+        super.onCreate()
+
+        criarCanalNotificacao()
+
+        iniciarForeground()
+
+        criarInterfaceTun()
+    }
+
+    override fun onStartCommand(
+        intent: Intent?,
+        flags: Int,
+        startId: Int
+    ): Int {
+
+        when (intent?.action) {
+
+            ACTION_START -> {
+
+                if (!interfaceCriada) {
+                    criarInterfaceTun()
+                }
+            }
+
+            ACTION_STOP -> {
+
+                encerrarTun()
+
+                stopForeground(true)
+
+                stopSelf()
+            }
+        }
+
+        return START_NOT_STICKY
+    }
+
+    private fun criarInterfaceTun() {
+
+        if (interfaceCriada) {
+            return
+        }
+
+        try {
+
+            val builder =
+                Builder()
+                    .setSession("AdaLink Connectivity Lab")
+                    .addAddress(
+                        VPN_ADDRESS,
+                        VPN_PREFIX
+                    )
+
+            /*
+             * IMPORTANTE:
+             *
+             * Não adicionamos:
+             *
+             * addRoute("0.0.0.0", 0)
+             *
+             * Portanto o laboratório não assume
+             * automaticamente todo o tráfego
+             * de Internet do aparelho.
+             */
+
+            val tun =
+                builder.establish()
+
+            if (tun == null) {
+
+                interfaceCriada = false
+
+                return
+            }
+
+            tunInterface = tun
+
+            val descriptor =
+                tun.fileDescriptor
+
+            tunInput =
+                FileInputStream(descriptor)
+
+            tunOutput =
+                FileOutputStream(descriptor)
+
+            interfaceCriada = true
+
+            executando.set(true)
+
+            iniciarLeitura()
+
+        } catch (e: Exception) {
+
+            interfaceCriada = false
+
+            executando.set(false)
+
+            tunInterface?.close()
+
+            tunInterface = null
+
+            tunInput = null
+
+            tunOutput = null
+        }
+    }
+
+    private fun iniciarLeitura() {
+
+        if (threadLeitura != null) {
+            return
+        }
+
+        threadLeitura =
+            Thread {
+
+                val buffer =
+                    ByteBuffer.allocate(32767)
+
+                while (executando.get()) {
+
+                    try {
+
+                        val input =
+                            tunInput ?: break
+
+                        buffer.clear()
+
+                        val quantidade =
+                            input.read(buffer.array())
+
+                        if (quantidade > 0) {
+
+                            pacotesLidos++
+
+                            bytesLidos +=
+                                quantidade.toLong()
+                        }
+
+                    } catch (e: Exception) {
+
+                        if (executando.get()) {
+                            break
+                        }
+                    }
+                }
+
+            }.apply {
+
+                name =
+                    "AdaLink-TUN-Reader"
+
+                isDaemon = true
+
+                start()
+            }
+    }
+
+    fun escreverPacote(
+        pacote: ByteArray
+    ): Boolean {
+
+        if (!interfaceCriada) {
+            return false
+        }
+
+        return try {
+
+            val output =
+                tunOutput ?: return false
+
+            output.write(pacote)
+
+            output.flush()
+
+            pacotesEscritos++
+
+            bytesEscritos +=
+                pacote.size.toLong()
+
+            true
+
+        } catch (e: Exception) {
+
+            false
+        }
+    }
+
+    private fun encerrarTun() {
+
+        executando.set(false)
+
+        threadLeitura = null
+
+        try {
+            tunInput?.close()
+        } catch (_: Exception) {
+        }
+
+        try {
+            tunOutput?.close()
+        } catch (_: Exception) {
+        }
+
+        try {
+            tunInterface?.close()
+        } catch (_: Exception) {
+        }
+
+        tunInput = null
+        tunOutput = null
+        tunInterface = null
+
+        interfaceCriada = false
+    }
+
+    override fun onDestroy() {
+
+        encerrarTun()
+
+        super.onDestroy()
+    }
+
+    override fun onRevoke() {
+
+        encerrarTun()
+
+        super.onRevoke()
+    }
+
+    private fun criarCanalNotificacao() {
+
+        if (Build.VERSION.SDK_INT >=
+            Build.VERSION_CODES.O
+        ) {
+
+            val manager =
+                getSystemService(
+                    NotificationManager::class.java
+                )
+
+            val channel =
+                NotificationChannel(
+                    CHANNEL_ID,
+                    "AdaLink Connectivity Lab",
+                    NotificationManager.IMPORTANCE_LOW
+                )
+
+            manager.createNotificationChannel(
+                channel
+            )
+        }
+    }
+
+    private fun iniciarForeground() {
+
+        val notification =
+            criarNotificacao()
+
+        if (Build.VERSION.SDK_INT >=
+            Build.VERSION_CODES.Q
+        ) {
+
+            startForeground(
+                NOTIFICATION_ID,
+                notification
+            )
+
+        } else {
+
+            startForeground(
+                NOTIFICATION_ID,
+                notification
+            )
+        }
+    }
+
+    private fun criarNotificacao(): Notification {
+
+        return if (
+            Build.VERSION.SDK_INT >=
+            Build.VERSION_CODES.O
+        ) {
+
+            Notification.Builder(
+                this,
+                CHANNEL_ID
+            )
+                .setContentTitle(
+                    "AdaLink Connectivity Lab"
+                )
+                .setContentText(
+                    "Laboratório VPN/TUN ativo"
+                )
+                .setSmallIcon(
+                    android.R.drawable.ic_dialog_info
+                )
+                .setOngoing(true)
+                .build()
+
+        } else {
+
+            Notification.Builder(this)
+                .setContentTitle(
+                    "AdaLink Connectivity Lab"
+                )
+                .setContentText(
+                    "Laboratório VPN/TUN ativo"
+                )
+                .setSmallIcon(
+                    android.R.drawable.ic_dialog_info
+                )
+                .setOngoing(true)
+                .build()
+        }
+    }
+
+    override fun onBind(
+        intent: Intent?
+    ): IBinder? {
+
+        return super.onBind(intent)
+    }
+}
