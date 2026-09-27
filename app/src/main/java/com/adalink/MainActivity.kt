@@ -16,6 +16,7 @@ import android.net.VpnService
 class MainActivity : Activity() {
 
     private lateinit var info: TextView
+    private lateinit var connectivityLab: Button
     private lateinit var lm: LocationManager
 
     private var sats = 0
@@ -333,41 +334,28 @@ gnssPacketInspector.setOnClickListener {
                 .setPositiveButton("FECHAR", null)
                 .show()
         }
-                val connectivityLab = Button(this)
-        connectivityLab.text = "🔌 ADALINK CONNECTIVITY LAB"
-        tela.addView(connectivityLab)
+              connectivityLab = Button(this)
+connectivityLab.text = "🔌 ADALINK CONNECTIVITY LAB"
+tela.addView(connectivityLab)
 
-        connectivityLab.setOnClickListener {
+connectivityLab.setOnClickListener {
 
-            val intent = VpnService.prepare(this@MainActivity)
+    val intent = VpnService.prepare(this@MainActivity)
 
-            if (intent != null) {
+    if (intent != null) {
 
-                startActivityForResult(
-                    intent,
-                    3001
-                )
+        startActivityForResult(
+            intent,
+            3001
+        )
 
-            } else {
+    } else {
 
-                val serviceIntent =
-                    Intent(
-                        this@MainActivity,
-                        AdaVpnService::class.java
-                    )
-
-                serviceIntent.action =
-                    AdaVpnService.ACTION_START
-
-                startService(serviceIntent)
-
-                Toast.makeText(
-                    this@MainActivity,
-                    "🔌 Iniciando AdaLink Connectivity Lab...",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-        }
+        iniciarConnectivityLab(
+            connectivityLab
+        )
+    }
+}
         info = TextView(this)
         info.textSize = 14f
         info.setTextColor(Color.WHITE)
@@ -542,22 +530,77 @@ lm.registerGnssMeasurementsCallback(
         resultCode == RESULT_OK
     ) {
 
-        val serviceIntent =
-            Intent(
-                this@MainActivity,
-                AdaVpnService::class.java
-            )
+       Toast.makeText(
+    this@MainActivity,
+    "🔌 VPN autorizada. Iniciando TUN...",
+    Toast.LENGTH_SHORT
+).show()
 
-        serviceIntent.action =
-            AdaVpnService.ACTION_START
-
-        startService(serviceIntent)
-
-        Toast.makeText(
-            this@MainActivity,
-            "🔌 VPN autorizada. Iniciando TUN...",
-            Toast.LENGTH_LONG
-        ).show()
+iniciarConnectivityLab(
+    connectivityLab
+)
                 }
             }
-            }       
+    private fun iniciarConnectivityLab(
+    botao: Button
+) {
+
+    val serviceIntent =
+        Intent(
+            this@MainActivity,
+            AdaVpnService::class.java
+        )
+
+    serviceIntent.action =
+        AdaVpnService.ACTION_START
+
+    startService(serviceIntent)
+
+    botao.text =
+        "🔄 ADALINK CONNECTIVITY LAB — INICIANDO..."
+
+    verificarConnectivityLab(
+        botao
+    )
+}
+
+private fun verificarConnectivityLab(
+    botao: Button,
+    tentativa: Int = 0
+) {
+
+    Handler(mainLooper).postDelayed({
+
+        if (AdaVpnService.interfaceCriada) {
+
+            botao.text =
+                "🟢 ADALINK CONNECTIVITY LAB — TUN ATIVO"
+
+            Toast.makeText(
+                this@MainActivity,
+                "✅ TUN AdaLink criado com sucesso",
+                Toast.LENGTH_LONG
+            ).show()
+
+        } else if (tentativa < 9) {
+
+            verificarConnectivityLab(
+                botao,
+                tentativa + 1
+            )
+
+        } else {
+
+            botao.text =
+                "🔴 ADALINK CONNECTIVITY LAB — NÃO CONFIRMADO"
+
+            Toast.makeText(
+                this@MainActivity,
+                "⚠️ TUN não confirmado após 10 segundos",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+
+    }, 1000)
+}
+        
