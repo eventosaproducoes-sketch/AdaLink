@@ -224,6 +224,7 @@ private fun criarInterfaceTun() {
         executando.set(true)
 
         iniciarLeitura()
+        gerarPacoteTeste()
 
     } catch (e: Exception) {
 
@@ -329,7 +330,43 @@ private fun criarInterfaceTun() {
                 start()
             }
     }
+private fun gerarPacoteTeste() {
+    Thread {
+        try {
+            Thread.sleep(500)
 
+            val socket = DatagramSocket()
+
+            val dados = "ADALINK_TESTE_001".toByteArray()
+
+            val destino = InetSocketAddress(
+                "10.77.0.2",
+                47001
+            )
+
+            val pacote = java.net.DatagramPacket(
+                dados,
+                dados.size,
+                destino
+            )
+
+            socket.send(pacote)
+            socket.close()
+
+            android.util.Log.i(
+                "AdaLinkVPN",
+                "PACOTE TESTE UDP ENVIADO | destino=10.77.0.2:47001 | bytes=${dados.size}"
+            )
+
+        } catch (e: Exception) {
+            android.util.Log.e(
+                "AdaLinkVPN",
+                "ERRO AO GERAR PACOTE TESTE",
+                e
+            )
+        }
+    }.start()
+}
     fun escreverPacote(
         pacote: ByteArray
     ): Boolean {
