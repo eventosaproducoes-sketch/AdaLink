@@ -165,7 +165,10 @@ private fun criarInterfaceTun() {
                     VPN_ADDRESS,
                     VPN_PREFIX
                 )
-
+        .addRoute(
+            "10.77.0.2",
+            32
+        )
         /*
          * IMPORTANTE:
          *
